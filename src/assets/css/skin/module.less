@@ -1,0 +1,1025 @@
+/*模块*/
+
+
+/*登录&注册*/
+
+.m-login {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 640px;
+    height: 356px;
+    margin-left: -320px;
+    margin-top: -178px;
+    background-color: #fff;
+    box-shadow: 0 40px 50px -20px #365785;
+    .form-part {
+        position: absolute;
+        left: 0;
+        right: 400px;
+        height: 100%;
+        overflow: hidden;
+    }
+    .form-part-inner {
+        padding: 30px 30px 0;
+    }
+    .title {
+        font-family: "PingFang-SC-Heavy";
+        font-size: 20px;
+        color: #313c4c;
+        line-height: 20px;
+        letter-spacing: 1.2px;
+    }
+    .subtitle {
+        font-family: PingFang-SC-Light;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #313c4c;
+        letter-spacing: 0.72px;
+        line-height: 12px;
+    }
+    .box {
+        margin-top: 46px;
+        &.box-regist {
+            margin-top: 26px;
+        }
+    }
+    .form-item {
+        position: relative;
+        margin-bottom: 16px;
+        &.form-item-1 {
+            margin-bottom: 6px;
+        }
+    }
+    .form-label {
+        display: inline-block;
+        font-size: 12px;
+        line-height: 12px;
+        letter-spacing: 0.72px;
+        color: #c6ccd5;
+    }
+    .errortip {
+        margin-bottom: 6px;
+        text-align: left;
+        font-family: "PingFang-SC-Medium";
+        font-size: 12px;
+        color: #ff5454;
+        letter-spacing: 0.72px;
+        line-height: 12px;
+    }
+    .gotoLogin {
+        display: inline-block;
+        margin-top: 16px;
+        font-family: PingFang-SC-Medium;
+        font-size: 12px;
+        color: #c6ccd5;
+        letter-spacing: 0.72px;
+        line-height: 12px;
+    }
+    .banner {
+        position: absolute;
+        right: 0;
+        top: 0;
+        width: 400px;
+        height: 100%;
+        background: url(../../images/banner.png) center center no-repeat;
+        background-size: 400px 356px;
+    }
+}
+
+
+/*创建房间与加入房间*/
+
+.m-header {
+    position: relative;
+    height: 50px;
+    background-color: rgba(0, 0, 0, 0.1);
+    color: #fff;
+    font-size: 14px;
+    font-family: PingFangSC-Semibold;
+    .logo {
+        position: absolute;
+        left: 13px;
+        top: 9px;
+        padding-left: 143px;
+        font-family: PingFangSC-Semibold;
+        font-size: 14px;
+        color: #fff;
+        line-height: 33px;
+        height: 33px;
+        background:url(../../images/logo.png) left center no-repeat;
+        background-size:133px 33px;
+    }
+    .opt {
+        position: absolute;
+        right: 0;
+        top: 11px;
+        height: 28px;
+        line-height: 28px;
+    }
+    .logout {
+        font-family: PingFangSC-Semibold;
+        font-size: 14px;
+        color: #fff;
+    }
+    .close {
+        display: inline-block;
+        width: 14px;
+        height: 14px;
+        background: url(../../images/close.svg) center center no-repeat;
+        background-size: 14px 14px;
+        span {
+            display: none;
+        }
+    }
+    .opt-inner {
+        margin-left: 10px;
+        display: inline-block;
+        border-left: 1px #fff solid;
+        width: 67px;
+        text-align: center;
+    }
+}
+
+.m-home {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 640px;
+    height: 400px;
+    margin-left: -320px;
+    margin-top: -200px;
+    background-color: #fff;
+    box-shadow: 0 40px 50px -20px #365785;
+    .part {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        overflow: hidden;
+        width: 320px;
+        height: 400px;
+    }
+    .part-1 {
+        left: 0;
+    }
+    .part-2 {
+        right: 0;
+        border-left: 1px #eff2f6 solid;
+    }
+    .icon {
+        display: inline-block;
+        margin-top: 70px;
+        width: 182px;
+        height: 160px;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+    .icon-createroom {
+        padding-left: 74px;
+        padding-right: 68px;
+        background-image: url(../../images/createroom.png);
+        background-size: 134px 92px;
+    }
+    .icon-joinroom {
+        padding-left: 68px;
+        padding-right: 69px;
+        background-image: url(../../images/joinroom.png);
+        background-size: 136px 85px;
+    }
+    .item {
+        margin-top: 5px;
+        margin-bottom: 20px;
+    }
+    .item-1 {}
+    .item-2 {
+        margin-top: 0;
+    }
+    .tip {
+        position: absolute;
+        left: 45px;
+        bottom: 20px;
+        font-size: 12px;
+        color: #7e858d;
+        letter-spacing: 0.72px;
+        line-height: 12px;
+    }
+    .errortip {
+        margin: -14px auto 20px;
+        width: 180px;
+        text-align: left;
+        font-family: "PingFang-SC-Medium";
+        font-size: 12px;
+        color: #ff5454;
+        letter-spacing: 0.72px;
+        line-height: 12px;
+    }
+}
+
+
+/*白板页*/
+
+.m-main {
+    position: absolute;
+    top: 50px; // top: 50%;
+    // margin-top: -315px;
+    //left: 50%;
+	left: 40%;
+    margin-left: -505px;
+    //width: 1010px;
+    //height: 630px;
+	width: 1325px;
+    height: 800px;
+    .room-info {
+        position: absolute;
+        left: 0;
+        top: 63px;
+        padding-left: 32px;
+        height: 26px;
+        font-family: PingFangSC-Semibold;
+        font-size: 12px;
+        color: #ffffff;
+        letter-spacing: 0.72px;
+        line-height: 26px;
+        user-select: text;
+    }
+    .more-opt {
+        position: absolute;
+        right: 0;
+        top: 23px;
+        min-width: 280px;
+        text-align: right;
+        .tip {
+            margin-top: 17px;
+            font-family: PingFang-SC-Medium;
+            font-size: 12px;
+            color: #ffffff;
+            letter-spacing: 0.72px;
+            line-height: 12px;
+        }
+    }
+}
+
+
+/*白板容器*/
+
+.m-whiteboard {
+    position: absolute;
+    left: 0;
+    top: 100px;
+    //width: 700px;
+    //height: 530px;
+	width: 925px;
+    height: 700px;
+    background-color: #fff;
+}
+
+.m-whiteboard-container, .m-fullscreen-box {
+    position: relative;
+    width: 100%;
+    //height: 490px;
+	height: 660px;
+    .share-text{
+        font-size: 16px;
+        color: #7e858d;  
+        padding: 160px 140px 0;
+        text-align: center;
+        line-height: 22px;
+        a{
+            color: #076bf2;
+        }
+    }
+    .share-text2{
+        font-size: 16px;
+        color: #7e858d;  
+        padding: 160px 20px 0;
+        text-align: center;
+        line-height: 22px;
+        a{
+            color: #076bf2;
+        }
+    }
+    video::-webkit-media-controls {
+        display:none !important;
+    }
+    .video-fullscreen{
+        background: url(../../images/fullscreen.png) no-repeat;
+        background-size: contain;
+        width: 18px;
+        height: 18px;
+        position: absolute;
+        right: 10px;
+        bottom: 5px;
+        display: inline-block;
+        cursor: pointer;
+    }
+    .video-fullscreen-box{
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        z-index: 1001;
+        width: 100%;
+        height: 40px;
+        line-height: 40px;
+        background-image: linear-gradient( -180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);;
+        .exit-fullscreen {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            position: absolute;
+            left: 10px;
+            bottom: 5px;
+            background-position: center center;
+            background-size: 18px 18px;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            background-image: url(../../images/small.png);
+        }
+    }
+    .video-share-container{
+        width: 100%;
+        height: 100%;
+        text-align: center;
+        position: relative;
+        .share-plug{
+            margin-top: 20px;;
+            display: inline-block;
+            font-size: 14px;
+            width: auto;
+            padding: 0 10px;
+            height: 34px;
+            line-height: 34px;
+            text-align: center;
+            background-color: #076bf2;
+            color: #fff;
+            border: none;
+            box-shadow: 0 8px 15px -8px rgba(7, 107, 242, 0.6);
+            border-radius: 17px;
+            letter-spacing: 0.84px;
+        }
+        .share-plug:hover{
+            background-color: #2c8dff;
+        }
+    }
+    .video-share {
+        width: 100%;
+        height: 100%;
+    }
+    .change-video{
+        margin: 20px auto;
+    }
+    .msg {
+        margin-top: 96px;
+        font-family: PingFang-SC-Medium;
+        font-size: 16px;
+        color: #acb5c2;
+        letter-spacing: 0.96px;
+        text-align: center;
+    }
+    .u-file-icon {
+        width: auto;
+        white-space: nowrap;
+        font-size: 12px;
+    }
+}
+.m-fullscreen-box{
+    z-index: 1000;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 530px;
+}
+.m-whiteboard-video{
+    video{
+        width: 100%!important;
+        height: 100%!important;
+        transform: translate(0,0)!important;
+        position: static!important;
+        background: #fff;
+    }
+}
+.m-whiteboard-canvas {
+    width: 100%;
+    height: 100%;
+}
+
+//学生端覆盖在白板上的屏幕共享区域
+.m-whiteboard-container-cover {
+    z-index: 1000;
+    position: absolute;
+    left: 0;
+    top: 40px;
+    .toolbar {
+        position: absolute;
+        right: 20px;
+        bottom: 20px;
+        z-index: 10;
+        .fullscreen {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            background-position: center center;
+            background-size: 18px 18px;
+            background-repeat: no-repeat;
+            cursor: pointer;
+            background-image: url(../../images/icon-fullscreen-close.png);
+        }
+    }
+}
+
+.m-kit {
+    position: absolute;
+    z-index: 111; // display: flex;
+    // justify-content: center;
+    // align-items: center;
+    color: black;
+}
+
+.m-kit-wb {
+    bottom: 0; // width: 435px;
+    padding: 5px 10px;
+    border-radius: 5px 5px 0 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    left: 50%;
+    transform: translate(-50%, 0);
+    .u-grid-col {
+        display: inline-block;
+        &:not(:first-child) {
+            // padding-left: 10px;
+            border-left: 1px dashed #e6e6e6;
+        }
+    }
+    .m-kit-wb-option {
+        width: 140px;
+    }
+    .m-kit-wb-pagination {
+        // min-width: 100px;
+        width: 120px;
+    }
+    .m-kit-wb-file {
+        border-left: 1px dashed #fff;
+        display: inherit;
+    }
+    .m-kit-wb-file-item {
+        width: 55px;
+    }
+}
+
+.m-kit-file {
+    width: 460px;
+    height: 415px;
+    background: #fff;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    box-shadow: 0 6px 15px 0 rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.m-kit-file-header,
+.m-kit-file-body,
+.m-kit-file-footer {
+    width: 458px;
+    height: 40px;
+    position: absolute;
+}
+
+.m-kit-file-header {
+    top: 0;
+    background: #eff2f6;
+    font-size: 14px;
+    color: #3d96f5;
+    height: 34px;
+    line-height: 34px !important;
+    .u-icon {
+        float: right;
+        height: 100%;
+        line-height: 2.5;
+        color: #3d96f5;
+        font-size: 14px;
+    }
+}
+
+.m-kit-file-footer {
+    bottom: 0;
+    border-top: 1px solid #aaa;
+    line-height: 40px !important;
+    color: #076bf2;
+    text-align: center;
+    font-size: 12px;
+    cursor: pointer;
+    .u-tip {
+        top: -26px;
+        position: absolute;
+    }
+}
+
+.m-kit-file-body {
+    top: 34px;
+    bottom: 40px;
+    height: auto;
+    overflow: auto;
+    &.empty {
+        background: url("../../images/empty.png") no-repeat center;
+    }
+}
+
+.m-kit-file-content {
+    align-items: center;
+    margin-top: 5px;
+}
+
+.m-kit-file-item {
+    width: 418px;
+    height: 74px;
+    margin: 0 auto;
+    .u-progress {
+        width: 100%;
+    }
+}
+
+.m-kit-file-item-preview {
+    width: 56px;
+    height: 56px;
+    display: inline-block;
+    background-image: url("../../images/PDF.png");
+    background-repeat: no-repeat;
+    background-position: center;
+    &.ppt {
+        background-image: url("../../images/PPT.png");
+    }
+    &.pptx {
+        background-image: url("../../images/PPTX.png");
+    }
+}
+
+.m-kit-file-item-desc {
+    width: 200px;
+}
+
+.m-kit-file-item-desc {
+    text-align: left;
+}
+
+.m-kit-file-item-option {
+    display: flex;
+    align-items: center;
+    .u-btn {
+        margin: 0 5px;
+    }
+}
+
+.m-kit-file-item-option {
+    justify-content: center;
+}
+
+.m-kit-file-item-desc {
+    line-height: 14px !important;
+    height: 28px;
+    text-overflow: -o-ellipsis-lastline;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2; //这个表示要显示几行
+    -webkit-box-orient: vertical;
+}
+
+.m-kit-file-select {
+    position: absolute;
+    left: 0;
+    width: 100% !important;
+    cursor: pointer;
+    opacity: 0;
+}
+
+.m-kit-file-cancel {
+    font-size: 12px;
+    color: #076bf2;
+    cursor: pointer;
+    &:before {
+        content: "";
+        display: inline-block;
+        width: 1px;
+        height: 12px;
+        background: #aaa;
+        margin: 0 5px;
+        vertical-align: bottom;
+    }
+}
+
+
+/*颜色容器*/
+
+.m-kit .m-kit-color {
+    width: 150px;
+    padding: 8px;
+    background: #313c4c;
+    border-radius: 5px;
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    z-index: 0;
+    &:after {
+        content: "";
+        display: block;
+        width: 10px;
+        height: 10px;
+        background-color: #313c4c;
+        position: absolute;
+        left: 50%;
+        bottom: -10%;
+        transform: translate(-50%) rotate(45deg); // box-shadow: 0px 0px 2px 3px hsla(0, 0%, 0%, 0.2);
+        // z-index: -1;
+    }
+    .u-icon {
+        width: 15px;
+        height: 15px;
+    }
+}
+
+
+/*WEBRTC容器*/
+
+.m-netcall {
+    position: absolute;
+    right: 0;
+    top: 100px;
+    //width: 280px;
+    //height: 210px;
+	width: 370px;
+    height: 277px;
+    background-color: #313c4c;
+}
+
+.m-netcall-video {
+    position: absolute;
+    //width: 139px;
+    //height: 104px;
+	width: 184px;
+    height: 137px;
+    background-color: #7e858d;
+    &.video-1 {
+        left: 0;
+        top: 0;
+    }
+    &.video-2 {
+        right: 0;
+        top: 0;
+    }
+    &.video-3 {
+        left: 0;
+        bottom: 0;
+    }
+    &.video-4 {
+        right: 0;
+        bottom: 0;
+    }
+    .m-video {
+        position: absolute;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        bottom: 0;
+        background-image: url(../../images/room-nouser.png);
+        background-repeat: no-repeat;
+        background-position: center center;
+        //background-size: 139px 104px;
+		background-size: 184px 137px;
+        &.room-hasuser {
+            background-image: url(../../images/room-hasuser.png);
+        }
+        &.room-offline {
+            background-image: url(../../images/room-offline.png);
+        }
+        div:first-child {
+            background: #000;
+        }
+    }
+    .offline {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        color: #fff;
+        z-index: 10;
+    }
+    .video-name {
+        position: absolute;
+        z-index: 10;
+        right: 0;
+        bottom: 0;
+        color: #fff;
+    }
+    .video-toolbar {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        width: 100%;
+        height: 30px;
+        line-height: 30px;
+        background-image: linear-gradient( -180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.3) 100%);
+        .tip {
+            position: absolute;
+            top: -40px;
+            width: 104px;
+            height:53px;
+            line-height:53px;
+            background:url(../../images/tip_bg.png) center center no-repeat;
+            background-size:104px 53px;
+            text-align: center;
+
+            &.tip4video {
+                left: -34px;
+            }
+            &.tip4audio {
+                left: -9px;
+            }
+        }
+    }
+    .video,
+    .audio,
+    .fullscreen {
+        display: inline-block;
+        width: 18px;
+        height: 18px;
+        margin-top: 6px;
+        background-position: center center;
+        background-size: 18px 18px;
+        background-repeat: no-repeat;
+        cursor: pointer;
+    }
+    .video {
+        margin-left: 10px;
+        &.video-open {
+            background-image: url(../../images/icon-video.png);
+        }
+        &.video-close {
+            background-image: url(../../images/icon-video-close.png);
+        }
+        &.video-disabled {
+            background-image: url(../../images/icon-video-disabled.png);
+        }
+    }
+    .audio {
+        margin-left: 6px;
+        &.audio-open {
+            background-image: url(../../images/icon-audio.png);
+        }
+        &.audio-close {
+            background-image: url(../../images/icon-audio-close.png);
+        }
+        &.audio-disabled {
+            background-image: url(../../images/icon-audio-disabled.png);
+        }
+    }
+    .fullscreen {
+        margin-left: 10px;
+        &.fullscreen-open {
+            background-image: url(../../images/icon-fullscreen.png);
+        }
+        &.fullscreen-close {
+            background-image: url(../../images/icon-fullscreen-close.png);
+        }
+    }
+}
+
+
+/*聊天室容器*/
+
+.m-chatroom {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    //width: 280px;
+    //height: 320px;
+	width: 370px;
+    height: 423px;
+    background-color: #fff;
+    .pointer {
+        margin-left: 5px;
+        display: inline-block;
+        width: 6px;
+        height: 6px;
+        border-radius: 3px;
+        background-color: red;
+    }
+}
+
+.m-chatroom-chatarea {}
+
+.m-chatroom-list {
+    //height: 176px;
+	height: 279px;
+    padding-top: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    .history-toolbar {
+        text-align: center;
+        margin-bottom: 10px;
+    }
+    .msg {
+        clear: both;
+        float: left;
+        padding: 0 10px 10px;
+        //width: 260px;
+		width: 343px;
+        .avatar {
+            float: left;
+            width: 20px;
+            height: 20px;
+            border-radius: 10px;
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+            background-image: url(../../images/default-user.svg);
+        }
+        .content {
+            float: right;
+            //width: 234px;
+			width: 309px;
+        }
+        .nick {
+            font-family: PingFangSC-Semibold;
+            font-size: 12px;
+            color: #333333;
+            line-height: 14px;
+        }
+        .value {
+            margin-top: 6px;
+            font-family: PingFangSC-Regular;
+            font-size: 12px;
+            color: #666666;
+            letter-spacing: 0;
+            line-height: 14px;
+            word-break: break-all;
+        }
+        .emoji {
+            display: inline-block;
+            width: 28px;
+            height: 28px;
+            vertical-align: bottom;
+        }
+    }
+    .msg-notification {
+        margin: 0 10px 10px;
+        padding: 0;
+        width: 240px;
+        background-color: #fff;
+    }
+}
+
+.m-chatroom-list-1 {
+    padding-top: 0;
+}
+
+.m-chatroom-input {
+    position: relative;
+    //width: 280px;
+	width: 370px;
+    height: 100px;
+    background: #f8f9fb;
+    box-shadow: 0 -1px 0 0 #e0e5eb;
+    .msg-input {
+        position: absolute;
+        left: 0;
+        right: 0;
+        //width: 260px;
+		width: 343px;
+        padding: 10px 10px 0;
+        height: 44px;
+        background: #f8f9fb;
+        border: none;
+        bottom: 46px;
+        font-family: PingFang-SC-Medium;
+        font-size: 14px;
+        color: #313c4c;
+        letter-spacing: 0;
+        line-height: 14px;
+    }
+    .input-toolbar {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        height: 26px;
+        text-align: right;
+    }
+    .part {
+        float: right;
+        &.part-1 {}
+        &.part-2 {}
+        &.part-3 {}
+    }
+    .emojis,
+    .cq {
+        margin-right: 17px;
+        margin-top: 3px;
+        display: inline-block;
+        width: 22px;
+        height: 22px;
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-size: 22px 22px;
+        cursor: pointer;
+    }
+    .emojis {
+        background-image: url(../../images/emojis.png);
+    }
+    .cq {
+        background-image: url(../../images/cq.png);
+    }
+}
+
+
+/*表情卡片*/
+
+.m-emoji {
+    position: absolute;
+    bottom: 46px;
+    right: -1px;
+    height: 190px;
+    width: 300px;
+    border: 1px #ccc solid;
+    background-color: #fff;
+    .emoji-tab {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        width: 100%;
+        height: 30px;
+        img {
+            display: block;
+            width: inherit;
+            height: inherit;
+        }
+    }
+    .emoji-tab-item {
+        display: inline-block;
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+        &.active {
+            background-color: #f0f0f0;
+        }
+    }
+    .emoji-item {
+        display: inline-block;
+        width: 28px;
+        height: 28px;
+        padding: 1px;
+        vertical-align: middle;
+        cursor: pointer;
+        &.emoji-pinup-item {
+            width: 48px;
+            height: 48px;
+        }
+        img {
+            display: block;
+            width: inherit;
+            height: inherit;
+        }
+    }
+    .emoji-content {
+        position: absolute;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        background-color: #f0f0f0;
+        height: 160px;
+        overflow: auto;
+    }
+}
+
+// 其他样式，loading
+.canvas-loading {
+    position: relative;
+    &:after {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: block;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border-bottom: 1px solid #076bf2;
+        border-top: 1px solid #076bf2;
+        animation: canvas-animation 1s infinite;
+    }
+}
+
+@keyframes canvas-animation {
+    0% {
+        transform: rotate(90deg);
+    }
+    100% {
+        transform: rotate(180deg);
+    }
+}

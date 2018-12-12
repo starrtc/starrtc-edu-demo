@@ -1,0 +1,83 @@
+@icon-color-hover: #2d48a1;
+@icon-color-active: rgb(63, 145, 170);
+.u-icon {
+    cursor: pointer;
+    display: inline-block;
+    width: 20px;
+    height: 20px; // background: rgb(85, 84, 84);
+    line-height: 20px;
+    box-sizing: border-box;
+    // font-size: 1.5rem;
+    color: #fff;
+    margin: 0 5px;
+    vertical-align: middle;
+    &:hover {
+        color: @icon-color-hover;
+    }
+    &:active,
+    &.active {
+        color: @icon-color-active;
+    }
+    &.disable{
+        opacity: 0.5;
+    }
+}
+
+.u-icon-color {
+    height: 20px;
+    &:active,
+    &.active {
+        border: 1px solid #fff;
+    }
+}
+
+.u-icon-line,
+.u-icon-rect,
+.u-icon-circle,
+.u-icon-fill {
+    position: relative;
+    margin: 5px 0;
+    &:hover {
+        color: @icon-color-hover;
+    }
+    &:active,
+    &.active {
+        color: @icon-color-active;
+    }
+}
+
+.u-icon-line:after {
+    display: block;
+    content: '';
+    height: 2px;
+    width: 100%;
+    background-color: #fff;
+    position: absolute;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+.u-icon-line:hover:after {
+    background-color: @icon-color-hover;
+}
+
+.u-icon-line:active:after,
+.u-icon-line.active:after {
+    background-color: @icon-color-active;
+}
+
+.u-icon-rect,
+.u-icon-circle {
+    border: 2px solid #fff;
+    &:hover {
+        border-color: @icon-color-hover;
+    }
+    &:active,
+    &.active {
+        border-color: @icon-color-active;
+    }
+}
+
+.u-icon-circle {
+    border-radius: 50%;
+}
