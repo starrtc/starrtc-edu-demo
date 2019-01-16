@@ -8,5 +8,7 @@
 
 有问题请加QQ群讨论：807242783
 
+更多示例请参见：https://docs.starrtc.com/en/download/
 
-更多示例请参见：https://docs.starrtc.com/download/
+# 编译
+ npm run build
