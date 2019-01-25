@@ -1,4 +1,4 @@
-# edu-demo
+# 在线教育示例程序
 
 在线体验地址：https://www.starrtc.com/demo/edu
 

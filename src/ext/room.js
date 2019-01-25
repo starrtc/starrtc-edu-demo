@@ -36,7 +36,7 @@ export default {
 			try
 			{
 				let ret = await new Promise((resolve, reject) => {
-					$.get("https://api.starrtc.com/demo/class/info?uuid="+roomName)
+					$.get("https://api.starrtc.com/public/class/info?uuid="+roomName)
 					  .then((data, status) => {
 							if(status === "success"){
 								var obj = JSON.parse(data);
@@ -253,7 +253,7 @@ export default {
 		{
 		
 			let ret = await new Promise((resolve, reject) => {
-				$.get("https://api.starrtc.com/demo/class/info?uuid="+roomId)
+				$.get("https://api.starrtc.com/public/class/info?uuid="+roomId)
 				  .then((data, status) => {
 						if(status === "success"){
 							var obj = JSON.parse(data);

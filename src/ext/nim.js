@@ -20,6 +20,7 @@ const NetcallState = StoreNetcall.state;
 const NetcallAction = StoreNetcall;
 const EventPoolAction = StoreEventPool;
 const EventPoolState = StoreEventPool.state;
+const agentId = "stargWeHN8Y7";
 
 // SDK插件注册
 
@@ -30,7 +31,7 @@ export default {
   },
 
   getAuthKey(account) {
-	 return $.get("https://api.starrtc.com/demo/authKey.php?userid="+account)
+	 return $.get("https://api.starrtc.com/public/authKey.php?userid="+account+"&appid="+agentId)
       .then((data, status) => {
 			if(status === "success"){
 				var obj = JSON.parse(data);
@@ -64,7 +65,6 @@ export default {
       return Promise.reject("请输入登录名和密码");
     }
 	return new Promise((resolve ,reject) => {
-		var agentId = "BjR6QV3vUJ4d";
 		if(authKey)
 		{
 			window.StarRtc.Instance.login(agentId,account,authKey,
