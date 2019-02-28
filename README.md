@@ -11,6 +11,7 @@
 更多示例请参见：https://docs.starrtc.com/en/download/
 
 # 编译
+```java
  git clone https://github.com/starrtc/starrtc-edu-demo.git
  cd starrtc-edu-demo
  npm install
@@ -21,3 +22,4 @@
  2，cd starrtc-edu-demo/build
  3，mv * /opt/nginx/html/starrtc_demo/
  4，需要配置域名指向starrtc_demo目录
+```
