@@ -20,7 +20,6 @@ const NetcallState = StoreNetcall.state;
 const NetcallAction = StoreNetcall;
 const EventPoolAction = StoreEventPool;
 const EventPoolState = StoreEventPool.state;
-const agentId = "stargWeHN8Y7";
 
 // SDK插件注册
 
@@ -31,7 +30,7 @@ export default {
   },
 
   getAuthKey(account) {
-	 return $.get("https://api.starrtc.com/public/authKey.php?userid="+account+"&appid="+agentId)
+	 return $.get(window.StarRtc.Instance.workServerUrl+"/authKey.php?userid="+account+"&appid="+NimState.agentId)
       .then((data, status) => {
 			if(status === "success"){
 				var obj = JSON.parse(data);
@@ -67,7 +66,7 @@ export default {
 	return new Promise((resolve ,reject) => {
 		if(authKey)
 		{
-			window.StarRtc.Instance.login(agentId,account,authKey,
+			window.StarRtc.Instance.login(NimState.agentId,account,authKey,
 						(data, status) =>{
 							switch (status){
 							case "connect success":
@@ -84,7 +83,7 @@ export default {
 		{
 			that.getAuthKey(account)
 			.then(authKey => {
-				window.StarRtc.Instance.login(agentId,account,authKey,
+				window.StarRtc.Instance.login(NimState.agentId,account,authKey,
 						(data, status) =>{
 							switch (status){
 							case "connect success":

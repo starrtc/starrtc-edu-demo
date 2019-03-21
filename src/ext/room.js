@@ -27,404 +27,373 @@ const EventPoolState = StoreEventPool.state;
 // SDK插件注册
 
 export default {
-  async createRoom(roomName, userId, joinFlag = false){
-	  const that = this;
-	  const isTeacher = Number(Storage.get("isTeacher"));
-	  var roomInfo = {};
-		if(joinFlag)
-		{
-			try
-			{
-				let ret = await new Promise((resolve, reject) => {
-					$.get("https://api.starrtc.com/public/class/info?uuid="+roomName)
-					  .then((data, status) => {
-							if(status === "success"){
-								var obj = JSON.parse(data);
-								if(obj.status == 1){
-									roomInfo.ID = roomName; 
-									roomInfo.Creator = obj.data.userId;
-									roomInfo.Name = obj.data.name;
-									resolve();
-								}
-								else
-								{
-									return reject(obj.data);
-								}
-							}
-							else
-							{
-								return reject("请求房间信息失败！");
-							}
-					  })
-					  .catch(err => {
-						return reject(err);
-					  });  
-				});
-			}
-			catch(err)
-			{
-				return Promise.reject(err);
-			}
-		}
-		else
-		{
-			roomInfo.Name = roomName;
-			roomInfo.Type = 0;
-			roomInfo.ID = "";
-		}
-	  
-	  return new Promise((resolve,reject) => {
-		  var starRtc = NimState.nim;
-		  var currRoom = starRtc.getVideoLiveRoomSDK("src", joinFlag?"open":"new", 
-					(data, status, oper) =>
-					  {
-							var thisRoom = data.obj;
-							switch (status){
-								//链接状态
-								case "connect success":
-								switch(oper)
-								{
-									case "open":
-									thisRoom.createStream({
-										"video":{width: {ideal: 184}, height: {ideal: 137}, facingMode: {ideal: ["user"]}},
-										"audio":{deviceId: {ideal: ["default"]}}
-									});
-									break;
-									case "new":
-									thisRoom.createNew();
-									break;
-								}
-								break;
-								case "connect failed":
-								reject("connect failed");
-								break;
-								case "connect closed":
-								break;
-								case "onWebrtcMessage":
-									{
-										switch(data.type)
-										{
-											case "streamCreated":
-												if(data.status == "success")
-												{
-													switch(oper)
-													{
-														case "open":
-														thisRoom.joinRoom();
-														break;
-														case "new":
-														thisRoom.joinRoom();
-														break;
-													}
-												}
-												else
-												{
-													reject("获取摄像头视频失败！请检查摄像头设备是否接入！");
-												}
-												break;
-											case "srcApplyUpload":
-												if(data.status == "success")
-												{
-													ChatroomAction.addMember(
-														that.createMember4Component(
-														  NimState.account == data.userData.roomInfo.Creator?"owner":"guest",
-														  NimState.account,
-														  "",
-														  NimState.account,
-														  ""
-														)
-													  );
-													ChatroomAction.setChatroom(data.userData.roomInfo.ID, currRoom);
-													ChatroomAction.setCurrChatroomId(data.userData.roomInfo.ID);
-													NetcallAction.setRoom(currRoom);
-													resolve(data.userData.roomInfo.ID);
-												}
-												else
-												{
-													reject("上传视频申请失败！");
-													console.log("收到_webrtc_apply_failed");
-												}
-												break;
-											case "addUploader":
-											
-												var upUserId = that.getIdWithOutAgentId(data.upUserId);
-												var owner = data.userData.roomInfo.Creator == upUserId;
-												ChatroomAction.addMember(
-													that.createMember4Component(
-													  owner?"owner":"guest",
-													  upUserId,
-													  "",
-													  upUserId,
-													  ""
-													)
-												  );
-												  
-												if(!owner)
-												{
-													ChatroomAction.setMemberStatus(upUserId, 1);
-												}
-												
-												  NetcallAction.addMember(
-													  {
-														account: upUserId,
-														self: false,
-														streamObj: data.streamInfo.streamObj
-													  },
-													  false,
-													  false
-													);
-												
-												EXT_EVENTPOOL.handleRtcPermissionAndDraw(upUserId, undefined, data.streamInfo.streamObj);
-								
-												break;
-											case "removeUploader":
-												var upUserId = that.getIdWithOutAgentId(data.upUserId);
-												
-												EXT_ROOM.stopRemoteStream(upUserId);
-												NetcallAction.delMember(upUserId);
-												ChatroomAction.setMemberStatus(upUserId, 0);
-												// 画面取消
-												
-												EXT_ROOM.stopAllRemoteStream();
-												EXT_ROOM.reDrawVideos();
-											
-												break;
-											case "delChannel":
-											
-												break;
-											case "createChannel":
-												if(data.status == "success")
-												{
-													thisRoom.createStream();
-												}
-												else
-												{
-													reject("创建失败:" + data.msg);
-												}
-												break;
-											case "streamData":
-												var obj = JSON.parse(data.streamData);
-												EXT_WHITEBOARD.act({ account: obj.account, data: obj.data })
-												break;
-											case "serverErr":
-												alert("服务器错误：" + data.msg);
-											break;
-										}
-									}
-									break;
-									case "onChatRoomMessage":
-									{
-										switch(data.type)
-										{
-											case "recvChatPrivateMsg":
-												that.doProcessPrivateMsg(data);
-												
-											break;
-											case "recvChatMsg":
-												var msg = JSON.parse(data.msg.contentData);
-												that.onChatroomMsgs(msg);
-											break;
-											case "chatroomUserKicked":
-											
-											break;
-											case "deleteChatRoom":
-											
-											break;
-											case "serverErr":
-												alert("服务器错误：" + data.msg);
-											break;
-										}
-									}
-									break;
-							}
-					  }, 
-					  {"roomInfo":roomInfo}
-				);
-		currRoom.sigConnect();
-	  });
-	  
+  async createRoom(roomName, userId, joinFlag = false) {
+    const that = this;
+    const isTeacher = Number(Storage.get("isTeacher"));
+    var roomInfo = {};
+    if (joinFlag) {
+      try {
+        let ret = await new Promise((resolve, reject) => {
+          $.get(window.StarRtc.Instance.workServerUrl + "/class/info?uuid=" + roomName)
+            .then((data, status) => {
+              if (status === "success") {
+                var obj = JSON.parse(data);
+                if (obj.status == 1) {
+                  roomInfo.ID = roomName;
+                  roomInfo.Creator = obj.data.userId;
+                  roomInfo.Name = obj.data.name;
+                  resolve();
+                }
+                else {
+                  return reject(obj.data);
+                }
+              }
+              else {
+                return reject("请求房间信息失败！");
+              }
+            })
+            .catch(err => {
+              return reject(err);
+            });
+        });
+      }
+      catch (err) {
+        return Promise.reject(err);
+      }
+    }
+    else {
+      roomInfo.Name = roomName;
+      roomInfo.Type = 0;
+      roomInfo.ID = "";
+    }
+
+    return new Promise((resolve, reject) => {
+      var starRtc = NimState.nim;
+      var currRoom = starRtc.getVideoLiveRoomSDK("src", joinFlag ? "open" : "new",
+        (data, status, oper) => {
+          var thisRoom = data.obj;
+          switch (status) {
+            //链接状态
+            case "connect success":
+              switch (oper) {
+                case "open":
+                  thisRoom.createStream({
+                    "video": { width: { ideal: 184 }, height: { ideal: 137 }, facingMode: { ideal: ["user"] } },
+                    "audio": { deviceId: { ideal: ["default"] } }
+                  });
+                  break;
+                case "new":
+                  thisRoom.createNew();
+                  break;
+              }
+              break;
+            case "connect failed":
+              reject("connect failed");
+              break;
+            case "connect closed":
+              break;
+            case "onWebrtcMessage":
+              {
+                switch (data.type) {
+                  case "streamCreated":
+                    if (data.status == "success") {
+                      switch (oper) {
+                        case "open":
+                          thisRoom.joinRoom();
+                          break;
+                        case "new":
+                          thisRoom.joinRoom();
+                          break;
+                      }
+                    }
+                    else {
+                      reject("获取摄像头视频失败！请检查摄像头设备是否接入！");
+                    }
+                    break;
+                  case "srcApplyUpload":
+                    if (data.status == "success") {
+                      ChatroomAction.addMember(
+                        that.createMember4Component(
+                          NimState.account == data.userData.roomInfo.Creator ? "owner" : "guest",
+                          NimState.account,
+                          "",
+                          NimState.account,
+                          ""
+                        )
+                      );
+                      ChatroomAction.setChatroom(data.userData.roomInfo.ID, currRoom);
+                      ChatroomAction.setCurrChatroomId(data.userData.roomInfo.ID);
+                      NetcallAction.setRoom(currRoom);
+                      resolve(data.userData.roomInfo.ID);
+                    }
+                    else {
+                      reject("上传视频申请失败！");
+                      console.log("收到_webrtc_apply_failed");
+                    }
+                    break;
+                  case "addUploader":
+
+                    var upUserId = that.getIdWithOutAgentId(data.upUserId);
+                    var owner = data.userData.roomInfo.Creator == upUserId;
+                    ChatroomAction.addMember(
+                      that.createMember4Component(
+                        owner ? "owner" : "guest",
+                        upUserId,
+                        "",
+                        upUserId,
+                        ""
+                      )
+                    );
+
+                    if (!owner) {
+                      ChatroomAction.setMemberStatus(upUserId, 1);
+                    }
+
+                    NetcallAction.addMember(
+                      {
+                        account: upUserId,
+                        self: false,
+                        streamObj: data.streamInfo.streamObj
+                      },
+                      false,
+                      false
+                    );
+
+                    EXT_EVENTPOOL.handleRtcPermissionAndDraw(upUserId, undefined, data.streamInfo.streamObj);
+
+                    break;
+                  case "removeUploader":
+                    var upUserId = that.getIdWithOutAgentId(data.upUserId);
+
+                    EXT_ROOM.stopRemoteStream(upUserId);
+                    NetcallAction.delMember(upUserId);
+                    ChatroomAction.setMemberStatus(upUserId, 0);
+                    // 画面取消
+
+                    EXT_ROOM.stopAllRemoteStream();
+                    EXT_ROOM.reDrawVideos();
+
+                    break;
+                  case "delChannel":
+
+                    break;
+                  case "createChannel":
+                    if (data.status == "success") {
+                      $.get(starRtc.workServerUrl + "/class/store?appid=" + NimState.agentId + "&ID=" + data.userData.roomInfo.ID + "&Name=" + data.userData.roomInfo.Name + "&Creator=" + data.userData.roomInfo.Creator);
+                      thisRoom.createStream();
+                    }
+                    else {
+                      reject("创建失败:" + data.msg);
+                    }
+                    break;
+                  case "streamData":
+                    var obj = JSON.parse(data.streamData);
+                    EXT_WHITEBOARD.act({ account: obj.account, data: obj.data })
+                    break;
+                  case "serverErr":
+                    alert("服务器错误：" + data.msg);
+                    break;
+                }
+              }
+              break;
+            case "onChatRoomMessage":
+              {
+                switch (data.type) {
+                  case "recvChatPrivateMsg":
+                    that.doProcessPrivateMsg(data);
+
+                    break;
+                  case "recvChatMsg":
+                    var msg = JSON.parse(data.msg.contentData);
+                    that.onChatroomMsgs(msg);
+                    break;
+                  case "chatroomUserKicked":
+
+                    break;
+                  case "deleteChatRoom":
+
+                    break;
+                  case "serverErr":
+                    alert("服务器错误：" + data.msg);
+                    break;
+                }
+              }
+              break;
+          }
+        },
+        { "roomInfo": roomInfo }
+      );
+      currRoom.sigConnect();
+    });
+
   },
-  
-  async joinRoom(roomId, userId){
-	  const that = this;  
-	  var roomInfo = {};
-		
-		try
-		{
-		
-			let ret = await new Promise((resolve, reject) => {
-				$.get("https://api.starrtc.com/public/class/info?uuid="+roomId)
-				  .then((data, status) => {
-						if(status === "success"){
-							var obj = JSON.parse(data);
-							if(obj.status == 1){
-								roomInfo.ID = roomId; 
-								roomInfo.Creator = obj.data.userId;
-								roomInfo.Name = obj.data.name;
-								resolve();
-							}
-							else
-							{
-								return reject(obj.data);
-							}
-						}
-						else
-						{
-							return reject("请求房间信息失败！");
-						}
-				  })
-				  .catch(err => {
-					return reject(err);
-				  });  
-			});
-		}
-		catch(err)
-		{
-			return Promise.reject(err);
-		}
-	  
-	  return new Promise((resolve,reject) => {
-		var starRtc = NimState.nim;		
-		
-		var currRoom = starRtc.getVideoLiveRoomSDK("vdn", "open",
-					(data, status, oper) =>
-					  {
-						  var thisRoom = data.obj;
-						switch (status){
-							//链接状态
-							case "connect success":
-							switch(oper)
-							{
-								case "open":
-								thisRoom.createStream();
-								break;
-								case "new":
-								break;
-							}
-							break;
-							case "connect failed":
-							reject("connect failed");
-							break;
-							case "connect closed":
-							break;
-							case "onWebrtcMessage":
-								switch(data.type)
-								{
-									case "streamCreated":
-										if(data.status == "success")
-										{
-											thisRoom.joinRoom();
-										}
-										else
-										{
-											reject("获取摄像头视频失败！请检查摄像头设备是否接入！");
-										}
-										break;
-									case "vdnApplyDownload":
-										if(data.status == "success")
-										{
-											ChatroomAction.setChatroom(data.userData.roomInfo.ID, currRoom);
-											ChatroomAction.setCurrChatroomId(data.userData.roomInfo.ID);
-											NetcallAction.setRoom(currRoom);
-											resolve();
-										}
-										else
-										{
-											reject("获取数据失败");
-											console.log("收到vdnApplyDownload_failed");
-											thisRoom.leaveRoom();
-										}
-										break;
-									case "addUploader":
-									
-										var upUserId = that.getIdWithOutAgentId(data.upUserId);
-										var owner = data.userData.roomInfo.Creator == upUserId;
-										ChatroomAction.addMember(
-											that.createMember4Component(
-											  owner?"owner":"guest",
-											  upUserId,
-											  "",
-											  upUserId,
-											  ""
-											)
-										  );
-										
-										if(!owner)										
-										{
-											ChatroomAction.setMemberStatus(upUserId, 1);
-										}
-										  
-										  NetcallAction.addMember(
-											  {
-												account: upUserId,
-												self: false,
-												streamObj: data.streamInfo.streamObj
-											  },
-											  false,
-											  false
-											);
-										
-										EXT_EVENTPOOL.handleRtcPermissionAndDraw(upUserId, undefined, data.streamInfo.streamObj);
-										break;
-									case "removeUploader":
-										var upUserId = that.getIdWithOutAgentId(data.upUserId);
-							
-										EXT_ROOM.stopRemoteStream(upUserId);
-										NetcallAction.delMember(upUserId);
-										ChatroomAction.setMemberStatus(upUserId, 0);
-										
-										EXT_ROOM.stopAllRemoteStream();
-										EXT_ROOM.reDrawVideos();
-									
-										break;
-									case "streamData":			
-										var obj = JSON.parse(data.streamData);
-										EXT_WHITEBOARD.act({ account: obj.account, data: obj.data })
-										break;
-									case "serverErr":
-											alert("服务器错误：" + data.msg);
-										break;
-								}
-								break;
-							case "onChatRoomMessage":
-								{
-									switch(data.type)
-									{
-										case "recvChatPrivateMsg":
-											that.doProcessPrivateMsg(data);
-										
-										break;
-										case "recvChatMsg":
-											var msg = JSON.parse(data.msg.contentData);
-											that.onChatroomMsgs(msg);
-										break;
-										case "chatroomUserKicked":
-											thisRoom.leaveRoom();
-											alert("你已被踢出房间！");
-										break;
-										case "serverErr":
-											alert("服务器错误：" + data.msg);
-										break;
-									}
-								}
-								break;
-						}
-					  }, 
-					  {"roomInfo":roomInfo}
-				);
-		currRoom.sigConnect();
-	  });
+
+  async joinRoom(roomId, userId) {
+    const that = this;
+    var roomInfo = {};
+
+    try {
+
+      let ret = await new Promise((resolve, reject) => {
+        $.get(window.StarRtc.Instance.workServerUrl + "/class/info?uuid=" + roomId)
+          .then((data, status) => {
+            if (status === "success") {
+              var obj = JSON.parse(data);
+              if (obj.status == 1) {
+                roomInfo.ID = roomId;
+                roomInfo.Creator = obj.data.userId;
+                roomInfo.Name = obj.data.name;
+                resolve();
+              }
+              else {
+                return reject(obj.data);
+              }
+            }
+            else {
+              return reject("请求房间信息失败！");
+            }
+          })
+          .catch(err => {
+            return reject(err);
+          });
+      });
+    }
+    catch (err) {
+      return Promise.reject(err);
+    }
+
+    return new Promise((resolve, reject) => {
+      var starRtc = NimState.nim;
+
+      var currRoom = starRtc.getVideoLiveRoomSDK("vdn", "open",
+        (data, status, oper) => {
+          var thisRoom = data.obj;
+          switch (status) {
+            //链接状态
+            case "connect success":
+              switch (oper) {
+                case "open":
+                  thisRoom.createStream();
+                  break;
+                case "new":
+                  break;
+              }
+              break;
+            case "connect failed":
+              reject("connect failed");
+              break;
+            case "connect closed":
+              break;
+            case "onWebrtcMessage":
+              switch (data.type) {
+                case "streamCreated":
+                  if (data.status == "success") {
+                    thisRoom.joinRoom();
+                  }
+                  else {
+                    reject("获取摄像头视频失败！请检查摄像头设备是否接入！");
+                  }
+                  break;
+                case "vdnApplyDownload":
+                  if (data.status == "success") {
+                    ChatroomAction.setChatroom(data.userData.roomInfo.ID, currRoom);
+                    ChatroomAction.setCurrChatroomId(data.userData.roomInfo.ID);
+                    NetcallAction.setRoom(currRoom);
+                    resolve();
+                  }
+                  else {
+                    reject("获取数据失败");
+                    console.log("收到vdnApplyDownload_failed");
+                    thisRoom.leaveRoom();
+                  }
+                  break;
+                case "addUploader":
+
+                  var upUserId = that.getIdWithOutAgentId(data.upUserId);
+                  var owner = data.userData.roomInfo.Creator == upUserId;
+                  ChatroomAction.addMember(
+                    that.createMember4Component(
+                      owner ? "owner" : "guest",
+                      upUserId,
+                      "",
+                      upUserId,
+                      ""
+                    )
+                  );
+
+                  if (!owner) {
+                    ChatroomAction.setMemberStatus(upUserId, 1);
+                  }
+
+                  NetcallAction.addMember(
+                    {
+                      account: upUserId,
+                      self: false,
+                      streamObj: data.streamInfo.streamObj
+                    },
+                    false,
+                    false
+                  );
+
+                  EXT_EVENTPOOL.handleRtcPermissionAndDraw(upUserId, undefined, data.streamInfo.streamObj);
+                  break;
+                case "removeUploader":
+                  var upUserId = that.getIdWithOutAgentId(data.upUserId);
+
+                  EXT_ROOM.stopRemoteStream(upUserId);
+                  NetcallAction.delMember(upUserId);
+                  ChatroomAction.setMemberStatus(upUserId, 0);
+
+                  EXT_ROOM.stopAllRemoteStream();
+                  EXT_ROOM.reDrawVideos();
+
+                  break;
+                case "streamData":
+                  var obj = JSON.parse(data.streamData);
+                  EXT_WHITEBOARD.act({ account: obj.account, data: obj.data })
+                  break;
+                case "serverErr":
+                  alert("服务器错误：" + data.msg);
+                  break;
+              }
+              break;
+            case "onChatRoomMessage":
+              {
+                switch (data.type) {
+                  case "recvChatPrivateMsg":
+                    that.doProcessPrivateMsg(data);
+
+                    break;
+                  case "recvChatMsg":
+                    var msg = JSON.parse(data.msg.contentData);
+                    that.onChatroomMsgs(msg);
+                    break;
+                  case "chatroomUserKicked":
+                    thisRoom.leaveRoom();
+                    alert("你已被踢出房间！");
+                    break;
+                  case "serverErr":
+                    alert("服务器错误：" + data.msg);
+                    break;
+                }
+              }
+              break;
+          }
+        },
+        { "roomInfo": roomInfo }
+      );
+      currRoom.sigConnect();
+    });
   },
-  
-  logout()
-  {
+
+  logout() {
     //断开连接
-	
-	const room = NetcallState.room;
-	room && room.leaveRoom() && room.sigDisconnect();
-	
-	NetcallAction.setRoom(null);
-	NetcallAction.setWebRtc(null)
+
+    const room = NetcallState.room;
+    room && room.leaveRoom() && room.sigDisconnect();
+
+    NetcallAction.setRoom(null);
+    NetcallAction.setWebRtc(null)
     NetcallAction.setVideo4ScreenShareing(false)
     NetcallAction.setScreenShareing4Local(false)
     NetcallAction.clearDoms()
@@ -445,157 +414,151 @@ export default {
     ChatroomAction.setCanLoadHistory(true);
     ChatroomAction.setShowEmojiPanel(false);
     ChatroomAction.setHasPermissionRequest(false);
-	
-	EventPoolAction.clearRemoteTrackNotifications()
 
-	EXT_WHITEBOARD.leaveChannel();
+    EventPoolAction.clearRemoteTrackNotifications()
+
+    EXT_WHITEBOARD.leaveChannel();
     EXT_WHITEBOARD.clearAll();
-	
+
     //清空标记
     Storage.remove("roomId");
     Storage.remove("isTeacher");
     Storage.remove("joinFlag");
-	
-	Storage.remove('hasPermission')
+
+    Storage.remove('hasPermission')
     Storage.remove('teacherAccount')
 
     Page.to("home");
   },
-  
-  doLinkStop()
-  {
-	  return new Promise((resolve, reject) => {
-			var currRoom = ChatroomState.currChatroom;
-			
-			this.joinRoom(ChatroomState.currChatroomId, NimState.account)
-			.then(()=> {
-				if(currRoom)
-				{
-					currRoom.leaveRoom();
-					currRoom.sigDisconnect();
-				}
-				
-				const index = NetcallAction.findMember({
-						  account: NimState.account
-						});
-				
-				this.stopLocalStream(NetcallState.doms[index]);
-				
-				NetcallAction.delMember(NimState.account);
-				
-				this.stopAllRemoteStream();
-				
-				NetcallAction.setHasPermission(false);
-				
-				ChatroomAction.setMemberStatus(NimState.account, 0);
-				
-				// 白板本地行为
-				EXT_WHITEBOARD.changeRoleToAudience();
-				resolve();
-			})
-			.catch(err => {
-				reject(err);
-			});
-	  });
+
+  doLinkStop() {
+    return new Promise((resolve, reject) => {
+      var currRoom = ChatroomState.currChatroom;
+
+      this.joinRoom(ChatroomState.currChatroomId, NimState.account)
+        .then(() => {
+          if (currRoom) {
+            currRoom.leaveRoom();
+            currRoom.sigDisconnect();
+          }
+
+          const index = NetcallAction.findMember({
+            account: NimState.account
+          });
+
+          this.stopLocalStream(NetcallState.doms[index]);
+
+          NetcallAction.delMember(NimState.account);
+
+          this.stopAllRemoteStream();
+
+          NetcallAction.setHasPermission(false);
+
+          ChatroomAction.setMemberStatus(NimState.account, 0);
+
+          // 白板本地行为
+          EXT_WHITEBOARD.changeRoleToAudience();
+          resolve();
+        })
+        .catch(err => {
+          reject(err);
+        });
+    });
   },
-  
+
   doProcessPrivateMsg(data) {
-		console.log("doProcessPrivateMsg 处理chat私有消息");
-		if(data.msg.msgType == "linkStop")
-		{
-			this.doLinkStop().then(() =>{
-				Alert.open({
-				  title: "提示",
-				  msg:
-					'<div class="u-end-interaction"><i class="u-icon-tip"></i>你被老师取消互动</div>',
-				  isHtml: true,
-				  btns: [
-					{
-					  label: "确定",
-					  clsName: "u-btn-smaller",
-					  onClick: () => {
-						console.log("【老师剔除学生，学生提示弹窗】--> 确定");
-						Alert.close();
-					  }
-					}
-				  ],
-				  close: () => {
-					console.log("【老师剔除学生，学生提示弹窗】--> x");
-					Alert.close();
-				  }
-				});
-			});
-		}
-		else if(data.msg.msgType == "apply")
-		{
-			Alert.open({
-			  title: "提示",
-			  msg:
-				'<div class="u-stop-interaction"><i class="u-icon-tip"></i>用户 ' + data.msg.fromId + ' 申请进行互动</div>',
-			  isHtml: true,
-			  btns: [
-				{
-				  label: "同意",
-				  clsName: "u-btn-smaller f-mgr-10",
-				  onClick: () => {
-					this.sendApplyAgreeMsg(data.msg.fromId);
-					Alert.close();
-				  }
-				},
-				{
-				  label: "拒绝",
-				  clsName: "u-btn-cancle",
-				  onClick: () => {
-					this.sendApplyDisagreeMsg(data.msg.fromId);
-					Alert.close();
-				  }
-				}
-			  ]
-			});
-		}
-		else if(data.msg.msgType == "applyAgree" || data.msg.msgType == "inviteStart")
-		{
-			var currRoom = ChatroomState.currChatroom;
-			
-			this.createRoom(ChatroomState.currChatroomId, "", true)
-			.then(()=> {
-				
-				currRoom.leaveRoom();
-				currRoom.sigDisconnect();
-				
-				NetcallAction.addMember(
-									  {
-										account: NimState.account,
-										self: true
-									  },
-									  false,
-									  false
-									);
-				
-				this.stopAllRemoteStream();
-				
-				NetcallAction.setHasPermission(true);
-				// 白板本地行为
-				EXT_WHITEBOARD.changeRoleToPlayer();
-				EXT_WHITEBOARD.checkColor();
-				
-				const index = NetcallAction.findMember({
-						  account: NimState.account
-						});
-				if(index != -1)
-				{
-					this.startLocalStream(NetcallState.doms[index]);
-				}
-				
-				ChatroomAction.setMemberStatus(NimState.account, 1);
-				
-			})
-			.catch(err => {
-				alert("fail");
-			});
-		}
+    console.log("doProcessPrivateMsg 处理chat私有消息");
+    if (data.msg.msgType == "linkStop") {
+      this.doLinkStop().then(() => {
+        Alert.open({
+          title: "提示",
+          msg:
+            '<div class="u-end-interaction"><i class="u-icon-tip"></i>你被老师取消互动</div>',
+          isHtml: true,
+          btns: [
+            {
+              label: "确定",
+              clsName: "u-btn-smaller",
+              onClick: () => {
+                console.log("【老师剔除学生，学生提示弹窗】--> 确定");
+                Alert.close();
+              }
+            }
+          ],
+          close: () => {
+            console.log("【老师剔除学生，学生提示弹窗】--> x");
+            Alert.close();
+          }
+        });
+      });
+    }
+    else if (data.msg.msgType == "apply") {
+      Alert.open({
+        title: "提示",
+        msg:
+          '<div class="u-stop-interaction"><i class="u-icon-tip"></i>用户 ' + data.msg.fromId + ' 申请进行互动</div>',
+        isHtml: true,
+        btns: [
+          {
+            label: "同意",
+            clsName: "u-btn-smaller f-mgr-10",
+            onClick: () => {
+              this.sendApplyAgreeMsg(data.msg.fromId);
+              Alert.close();
+            }
+          },
+          {
+            label: "拒绝",
+            clsName: "u-btn-cancle",
+            onClick: () => {
+              this.sendApplyDisagreeMsg(data.msg.fromId);
+              Alert.close();
+            }
+          }
+        ]
+      });
+    }
+    else if (data.msg.msgType == "applyAgree" || data.msg.msgType == "inviteStart") {
+      var currRoom = ChatroomState.currChatroom;
+
+      this.createRoom(ChatroomState.currChatroomId, "", true)
+        .then(() => {
+
+          currRoom.leaveRoom();
+          currRoom.sigDisconnect();
+
+          NetcallAction.addMember(
+            {
+              account: NimState.account,
+              self: true
+            },
+            false,
+            false
+          );
+
+          this.stopAllRemoteStream();
+
+          NetcallAction.setHasPermission(true);
+          // 白板本地行为
+          EXT_WHITEBOARD.changeRoleToPlayer();
+          EXT_WHITEBOARD.checkColor();
+
+          const index = NetcallAction.findMember({
+            account: NimState.account
+          });
+          if (index != -1) {
+            this.startLocalStream(NetcallState.doms[index]);
+          }
+
+          ChatroomAction.setMemberStatus(NimState.account, 1);
+
+        })
+        .catch(err => {
+          alert("fail");
+        });
+    }
   },
-  
+
   createChatroomMsg4Component(
     _type,
     _account,
@@ -613,7 +576,7 @@ export default {
       catalog: catalog
     };
   },
-  
+
   createChatroomMsg4Format(
     _type,
     _from,
@@ -651,7 +614,7 @@ export default {
           sourceText = sourceText.replace(
             text,
             `<img class="emoji" src="${
-              emojiCnt[text].img
+            emojiCnt[text].img
             }?imageView&thumbnail=28x28">`
           );
         }
@@ -661,17 +624,17 @@ export default {
     console.log("target text: ", sourceText);
     return sourceText;
   },
-  
+
   //发送聊天室消息
   sendChatroomMsg(content) {
     const chatroom = ChatroomState.currChatroom;
     const that = this;
     return new Promise((resolve, reject) => {
-			var msg = EXT_ROOM.createChatroomMsg4Format("text", NimState.account, null, NimState.account, content);
-			chatroom.sendChatMsg(JSON.stringify(msg));
-			that.onChatroomMsgs([msg]);
-			resolve();
-          //触发页面自动渲染
+      var msg = EXT_ROOM.createChatroomMsg4Format("text", NimState.account, null, NimState.account, content);
+      chatroom.sendChatMsg(JSON.stringify(msg));
+      that.onChatroomMsgs([msg]);
+      resolve();
+      //触发页面自动渲染
     });
   },
 
@@ -684,7 +647,7 @@ export default {
           type: 10,
           data: data
         }),
-        done: function(error, msg) {
+        done: function (error, msg) {
           if (error) {
             reject(error);
             return;
@@ -696,56 +659,56 @@ export default {
   },
 
   sendStreamData(data) {
-	const chatroom = ChatroomState.currChatroom;
+    const chatroom = ChatroomState.currChatroom;
     const that = this;
     return new Promise((resolve, reject) => {
-			chatroom.sendStreamData(data);
-			resolve();
-          //触发页面自动渲染
+      chatroom.sendStreamData(data);
+      resolve();
+      //触发页面自动渲染
     });
   },
-  
+
   //发送聊天室猜拳消息
   sendCqMsg() {
     const chatroom = ChatroomState.currChatroom;
     const that = this;
     return new Promise((resolve, reject) => {
-		
-		var content = JSON.stringify({
-			  type: 1,
-			  data: {
-				value: Math.ceil(Math.random() * 3)
-			  }
-          });
-		var msg = EXT_ROOM.createChatroomMsg4Format("custom", NimState.account, null, NimState.account, content);
-		msg.content = content;
-		chatroom.sendChatMsg(JSON.stringify(msg));
-		that.onChatroomMsgs([msg]);
-		resolve();
+
+      var content = JSON.stringify({
+        type: 1,
+        data: {
+          value: Math.ceil(Math.random() * 3)
+        }
+      });
+      var msg = EXT_ROOM.createChatroomMsg4Format("custom", NimState.account, null, NimState.account, content);
+      msg.content = content;
+      chatroom.sendChatMsg(JSON.stringify(msg));
+      that.onChatroomMsgs([msg]);
+      resolve();
     });
   },
-  
+
   sendPinupMsg(catalog, chartlet) {
     const chatroom = ChatroomState.currChatroom;
     const that = this;
     return new Promise((resolve, reject) => {
-		
-		var content = JSON.stringify({
-			  type: 3,
-			  data: {
-				catalog: catalog,
-				chartlet: chartlet
-			  }
-          });
-		
-		var msg = EXT_ROOM.createChatroomMsg4Format("custom", NimState.account, null, NimState.account, content);
-		msg.content = content;
-		chatroom.sendChatMsg(JSON.stringify(msg));
-		that.onChatroomMsgs([msg]);
-		resolve();
+
+      var content = JSON.stringify({
+        type: 3,
+        data: {
+          catalog: catalog,
+          chartlet: chartlet
+        }
+      });
+
+      var msg = EXT_ROOM.createChatroomMsg4Format("custom", NimState.account, null, NimState.account, content);
+      msg.content = content;
+      chatroom.sendChatMsg(JSON.stringify(msg));
+      that.onChatroomMsgs([msg]);
+      resolve();
     });
   },
-  
+
   onChatroomMsgs(msgs) {
     console.log("onChatroomMsgs", msgs);
 
@@ -770,7 +733,7 @@ export default {
       }
     }, 0);
   },
-  
+
   //格式化处理聊天室消息
   formatChatroomMsg(msg, onlyFormatMsg) {
     switch (msg.type) {
@@ -853,7 +816,7 @@ export default {
                     true,
                     false
                   );
-                  
+
                 } else {
                   NetcallAction.addMember(
                     {
@@ -880,12 +843,12 @@ export default {
                 console.log("uids: ", uids);
 
                 //通知有权限成员列表给上线学生【点对点】
-               
+
               } else if (msg.from == account) {
                 //老师/学生重新上线
                 console.log(
                   (msg.from == teacherAccount ? "老师" : "学生") +
-                    "上线，向所有人发送请求有权限的成员消息(2s后）进行"
+                  "上线，向所有人发送请求有权限的成员消息(2s后）进行"
                 );
                 setTimeout(() => {
                   if (NimState.hasReceiveHostMsg) {
@@ -941,7 +904,7 @@ export default {
               let custom = null;
               try {
                 custom = JSON.parse(attach.custom);
-              } catch (e) {}
+              } catch (e) { }
               if (custom == null) {
                 console.error("解析custom失败");
                 return;
@@ -968,7 +931,7 @@ export default {
                   NetcallState.doms[index],
                   teacherAccount
                 );
-               
+
               } else {
                 if (Storage.get("isTeacher") == 0) {
                   // 非教师下收到屏幕共享通知需重置标记
@@ -1111,14 +1074,14 @@ export default {
               });
 
               console.log('###### 已不再netcall互动列表的人员及对应位置为：', notmembers);
- 
+
               //如果有找到不再互动的原有节点则进行删除
-              notmembers.forEach(item=>{
+              notmembers.forEach(item => {
                 const currentDom = NetcallState.doms[item.index];
-                if(currentDom){
-                  let ele4Video= currentDom.getElementsByTagName('div');
-                  if(ele4Video.length>0){
-                    ele4Video =ele4Video[0];
+                if (currentDom) {
+                  let ele4Video = currentDom.getElementsByTagName('div');
+                  if (ele4Video.length > 0) {
+                    ele4Video = ele4Video[0];
                     console.log('**** 清理不再互动的画面节点：', ele4Video);
                     currentDom.removeChild(ele4Video);
                   }
@@ -1154,7 +1117,7 @@ export default {
       "聊天室自定义消息忽略不显示"
     );
   },
-  
+
   //重新渲染画面
   reDrawVideos() {
     NetcallState.members.forEach((item, index) => {
@@ -1174,124 +1137,118 @@ export default {
       }
     })
   },
-  
-  createVideoDomNode(node, uid)
-  {
-		var t = document.createElement("div");
-		t.style.overflow = "hidden",
-		t.style.position = "relative",
-		t.style.width = "184px",
-		t.style.height = "137px",
-		t.style.display = "none";
-		var n = document.createElement("video");
-		n.setAttribute("x-webkit-airplay", "x-webkit-airplay"),
-		n.setAttribute("playsinline", "playsinline"),
-		n.setAttribute("webkit-playsinline", "webkit-playsinline"),
-		n.preload = "auto",
-		n.dataset.uid = uid,
-		n.autoplay = "autoplay",
-		n.style.position = "absolute",
-		n.style.left = "50%",
-		n.style.top = "50%",
-		n.style.transform = "translate(-50%,-50%)",
-		n.style.width = "184px",
-		n.style.height = "137px",
-		t.appendChild(n),
-		setTimeout(function() {
-			t.style.display = "inline-block"
-		}, 1e3),
-		t.style.color = "#fff";
-		var r = document.createElement("p");
-		r.textContent = uid,
-		r.zIndex = 1,
-		t.appendChild(r);
-		node.appendChild(t);
-		return n;
+
+  createVideoDomNode(node, uid) {
+    var t = document.createElement("div");
+    t.style.overflow = "hidden",
+      t.style.position = "relative",
+      t.style.width = "184px",
+      t.style.height = "137px",
+      t.style.display = "none";
+    var n = document.createElement("video");
+    n.setAttribute("x-webkit-airplay", "x-webkit-airplay"),
+      n.setAttribute("playsinline", "playsinline"),
+      n.setAttribute("webkit-playsinline", "webkit-playsinline"),
+      n.preload = "auto",
+      n.dataset.uid = uid,
+      n.autoplay = "autoplay",
+      n.style.position = "absolute",
+      n.style.left = "50%",
+      n.style.top = "50%",
+      n.style.transform = "translate(-50%,-50%)",
+      n.style.width = "184px",
+      n.style.height = "137px",
+      t.appendChild(n),
+      setTimeout(function () {
+        t.style.display = "inline-block"
+      }, 1e3),
+      t.style.color = "#fff";
+    var r = document.createElement("p");
+    r.textContent = uid,
+      r.zIndex = 1,
+      t.appendChild(r);
+    node.appendChild(t);
+    return n;
   },
-  
+
   //预览远程视频流
   startRemoteStream(account, node, streamObj) {
-	  var vNode = this.createVideoDomNode(node, "");
-	  vNode.srcObject = streamObj;
+    var vNode = this.createVideoDomNode(node, "");
+    vNode.srcObject = streamObj;
   },
 
   //停止预览远程视频流
   stopAllRemoteStream() {
-	NetcallState.doms.forEach(item => {
-              item.innerHTML = "";
-            });
+    NetcallState.doms.forEach(item => {
+      item.innerHTML = "";
+    });
   },
-  
+
   //停止预览远程视频流
   stopRemoteStream(account) {
-	  
-	const index = NetcallAction.findMember({
-			  account: account
-			});
-	if(index != -1)
-	{
-		NetcallState.doms[index].innerHTML = "";
-	}
+
+    const index = NetcallAction.findMember({
+      account: account
+    });
+    if (index != -1) {
+      NetcallState.doms[index].innerHTML = "";
+    }
   },
-  
+
   //预览本地摄像头
   startLocalStream(node) {
-	var vNode = this.createVideoDomNode(node, "");
+    var vNode = this.createVideoDomNode(node, "");
     NetcallState.room.startLocalStream(vNode)
   },
 
   //停止预览本地摄像头
   stopLocalStream(node) {
-	  node.innerHTML = "";
+    node.innerHTML = "";
   },
-  
+
   sendApplyMsg() {
-	   const chatroom = ChatroomState.currChatroom;
-	   return new Promise((resolve, reject) => {
-			 chatroom.sendApplyMsg();
-			resolve();
-          //触发页面自动渲染
+    const chatroom = ChatroomState.currChatroom;
+    return new Promise((resolve, reject) => {
+      chatroom.sendApplyMsg();
+      resolve();
+      //触发页面自动渲染
     });
   },
-  
+
   sendApplyDisagreeMsg(userId) {
-	   const chatroom = ChatroomState.currChatroom;
-	   return new Promise((resolve, reject) => {
-			 chatroom.sendApplyDisagreeMsg(userId);
-			resolve();
-          //触发页面自动渲染
+    const chatroom = ChatroomState.currChatroom;
+    return new Promise((resolve, reject) => {
+      chatroom.sendApplyDisagreeMsg(userId);
+      resolve();
+      //触发页面自动渲染
     });
   },
-  
+
   sendApplyAgreeMsg(userId) {
-	   const chatroom = ChatroomState.currChatroom;
-	   return new Promise((resolve, reject) => {
-			 chatroom.sendApplyAgreeMsg(userId);
-			resolve();
-          //触发页面自动渲染
+    const chatroom = ChatroomState.currChatroom;
+    return new Promise((resolve, reject) => {
+      chatroom.sendApplyAgreeMsg(userId);
+      resolve();
+      //触发页面自动渲染
     });
   },
-  
-  sendLinkStopMsg(userId)
-  {
-	  const chatroom = ChatroomState.currChatroom;
-	   return new Promise((resolve, reject) => {
-			 chatroom.sendLinkStopMsg(userId);
-			resolve();
-          //触发页面自动渲染
+
+  sendLinkStopMsg(userId) {
+    const chatroom = ChatroomState.currChatroom;
+    return new Promise((resolve, reject) => {
+      chatroom.sendLinkStopMsg(userId);
+      resolve();
+      //触发页面自动渲染
     });
   },
-  
-  getIdWithOutAgentId(userId)
-  {
-	  const index = userId.indexOf("_");
-	  if(index != -1)
-	  {
-		  return userId.substring(index + 1);
-	  }
-	  else
-	  {
-		  return userId;
-	  }
+
+  getIdWithOutAgentId(userId) {
+    const index = userId.indexOf("_");
+    if (index != -1) {
+      return userId.substring(index + 1);
+    }
+    else {
+      return userId;
+    }
   }
 };

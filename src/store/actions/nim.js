@@ -12,6 +12,7 @@ console.log('Storage', Storage);
 export default class {
   @observable
   state = {
+    agentId:"stargWeHN8Y7",
     account: '',
     token: '',
     nim: null, //NIM SDK对象
