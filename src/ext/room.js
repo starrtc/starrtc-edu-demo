@@ -435,12 +435,13 @@ export default {
     return new Promise((resolve, reject) => {
       var currRoom = ChatroomState.currChatroom;
 
+      if (currRoom) {
+        currRoom.leaveRoom();
+        currRoom.sigDisconnect();
+      }
+
       this.joinRoom(ChatroomState.currChatroomId, NimState.account)
         .then(() => {
-          if (currRoom) {
-            currRoom.leaveRoom();
-            currRoom.sigDisconnect();
-          }
 
           const index = NetcallAction.findMember({
             account: NimState.account
@@ -470,6 +471,7 @@ export default {
     console.log("doProcessPrivateMsg 处理chat私有消息");
     if (data.msg.msgType == "linkStop") {
       this.doLinkStop().then(() => {
+        NetcallAction.setShowStatus(0);
         Alert.open({
           title: "提示",
           msg:
@@ -521,11 +523,13 @@ export default {
     else if (data.msg.msgType == "applyAgree" || data.msg.msgType == "inviteStart") {
       var currRoom = ChatroomState.currChatroom;
 
+      if (currRoom) {
+        currRoom.leaveRoom();
+        currRoom.sigDisconnect();
+      }
+
       this.createRoom(ChatroomState.currChatroomId, "", true)
         .then(() => {
-
-          currRoom.leaveRoom();
-          currRoom.sigDisconnect();
 
           NetcallAction.addMember(
             {
