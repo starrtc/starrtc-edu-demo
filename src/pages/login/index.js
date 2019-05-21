@@ -185,7 +185,7 @@ export default class Login extends Component {
             <div className="subtitle">Web Demo</div>
             <div className="box">
               <div className="form-item">
-                <label className="form-label">请输入账号</label>
+                <label className="form-label">请输入账号（任意填写）</label>
                 <Input
                   value={state.account}
                   onChange={this.changeAccount}
@@ -199,7 +199,7 @@ export default class Login extends Component {
                   state.showErrorTip ? 'form-item form-item-1' : 'form-item'
                 }
               >
-                <label className="form-label">请输入密码</label>
+                <label className="form-label">请输入密码（任意填写）</label>
                 <Input
                   type="password"
                   value={state.pwd}
