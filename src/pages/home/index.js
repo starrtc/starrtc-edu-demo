@@ -36,7 +36,10 @@ export default class Home extends Component {
     canCreate: false,
     canJoin: false,
     createLoading: false,
-    joinLoading: false
+    joinLoading: false,
+    selectRoomInfo: {
+      "index": -1
+    }
   };
 
   componentDidMount() {
@@ -46,39 +49,39 @@ export default class Home extends Component {
   }
 
   autoLogin() {
-   
-	if (NimState.nim)
-	{
-		console.log("已经登陆过");
-		return;
-	}
+
+    if (NimState.nim) {
+      console.log("已经登陆过");
+      EXT_ROOM.getClassRoomList();
+      return;
+    }
 
     console.log("home:开始自动登录nim过程...");
 
     const account = Storage.get("account");
     const token = Storage.get("token");
-	const authKey = Storage.get('authKey');
+    const authKey = Storage.get('authKey');
     if (!account || !token) {
       console.error("home:自动登录nim:缺少account或token");
       Page.to("login");
       return;
     }
 
-	EXT_NIM.login(account, token, authKey)
-	.then((key) =>{
-		Storage.set('account', account);
-		Storage.set('token', token);
-		Storage.set('authKey', authKey);
-	})
-	.catch(err =>
-	{
-		console.log(err);
-		Page.to("login");
-	});
+    EXT_NIM.login(account, token, authKey)
+      .then((key) => {
+        Storage.set('account', account);
+        Storage.set('token', token);
+        Storage.set('authKey', authKey);
+        EXT_ROOM.getClassRoomList();
+      })
+      .catch(err => {
+        console.log(err);
+        Page.to("login");
+      });
   }
 
   autoLoginChatroom() {
-    
+
     console.log("home:开始自动登录chatroom过程...");
 
     //步骤2：聊天室登录
@@ -95,7 +98,7 @@ export default class Home extends Component {
       joinLoading: true
     });
 
-    
+
   }
   changeRoomName = e => {
     const roomName = e.target.value;
@@ -129,13 +132,25 @@ export default class Home extends Component {
     });
   };
 
+  selectRoom = index => {
+    this.setState({
+      selectRoomInfo: {
+        "index": index,
+        "info": ChatroomState.rooms[index]
+      },
+      roomId: ChatroomState.rooms[index]["Name"],
+      canJoin: true
+    });
+  }
+
   preHandleRedirect() {
     //检测当前机器的可用设备
     console.log("检测当前机器的可用设备....");
-   
+
 
     Page.to("main");
   }
+
   createRoom = e => {
     console.log("submit createRoom");
 
@@ -158,26 +173,26 @@ export default class Home extends Component {
       createLoading: true
     });
 
-	const account = Storage.get("account");
-	const that = this;
-	
-	EXT_ROOM.createRoom(this.state.roomName, account)
-	.then(id => {
-		Storage.set("teacherAccount", NimState.account);
-		Storage.set("roomId", id);
-		Storage.set("isTeacher", 1);
-		Storage.set("hasPermission", true);
-		Page.to("main");
-	})
-	.catch(err =>{
-		console.log(err);
-		
-		that.setState({
+    const account = Storage.get("account");
+    const that = this;
+
+    EXT_ROOM.createRoom({ "Name": this.state.roomName }, account)
+      .then(id => {
+        Storage.set("teacherAccount", NimState.account);
+        Storage.set("roomId", id);
+        Storage.set("isTeacher", 1);
+        Storage.set("hasPermission", true);
+        Page.to("main");
+      })
+      .catch(err => {
+        console.log(err);
+
+        that.setState({
           showRoomNameTip: true,
           roomNameErrorMsg: err,
           createLoading: false
         });
-	});
+      });
   };
 
   joinRoom = e => {
@@ -188,10 +203,10 @@ export default class Home extends Component {
       return;
     }
 
-    if (Valid.isBlank(this.state.roomId)) {
+    if (this.state.selectRoomInfo["index"] === -1) {
       this.setState({
         showRoomIdTip: true,
-        roomIdErrorMsg: "房间ID号码不能为空"
+        roomIdErrorMsg: "请选择一个房间"
       });
       return;
     }
@@ -201,25 +216,25 @@ export default class Home extends Component {
       roomIdErrorMsg: "",
       joinLoading: true
     });
-	
-	const account = Storage.get("account");
-	const that = this;
-	
-	EXT_ROOM.joinRoom(this.state.roomId, account)
-	.then(() => {
-		Storage.set("roomId", this.state.roomId);
+
+    const account = Storage.get("account");
+    const that = this;
+
+    EXT_ROOM.joinRoom(this.state.selectRoomInfo["info"], account)
+      .then(() => {
+        Storage.set("roomId", this.state.roomId);
         Storage.set("isTeacher", 0);
-		Page.to("main");
-	})
-	.catch(err =>{
-		console.log(err);
-		
+        Page.to("main");
+      })
+      .catch(err => {
+        console.log(err);
+
         that.setState({
           showRoomIdTip: true,
           roomIdErrorMsg: err,
           joinLoading: false
         });
-	});
+      });
 
   };
 
@@ -257,12 +272,22 @@ export default class Home extends Component {
             </div>
           </div>
           <div className="part part-2">
-            <div className="icon icon-joinroom" />
+            <div className="icon icon-joinroom">
+              <Row >
+                <Col className="m-list-item" span={1}>房间列表</Col>
+              </Row>
+              {ChatroomState.rooms.map(
+                (item, index) => (
+                  <Row key={index}>
+                    <Col className="m-list-item m-list-item2" span={1} onClick={this.selectRoom.bind(this, index)}>{item.Name}</Col>
+                  </Row>
+                ))}
+            </div>
             <div className="item item-1 f-tac">
               <Input
+                disabled={true}
                 name="roomId"
-                placeholder="请输入房间号"
-                onChange={this.changeRoomId}
+                placeholder="请选择房间"
                 value={state.roomId}
                 domRef={input => {
                   this.roomIdInput = input;

@@ -23,6 +23,7 @@ export default class extends Component {
       maxLength,
       accept,
       multiple,
+      disabled,
     } = this.props;
     return (
       <input
@@ -39,6 +40,7 @@ export default class extends Component {
         maxLength={maxLength}
         accept={accept}
         multiple={multiple}
+        disabled={disabled ? 'disabled' : ''}
       />
     );
   }

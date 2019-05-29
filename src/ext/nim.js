@@ -26,81 +26,93 @@ const EventPoolState = StoreEventPool.state;
 export default {
   // 注册逻辑
   regist(param) {
-    
+
   },
 
   getAuthKey(account) {
-	 return $.get(window.StarRtc.Instance.workServerUrl+"/authKey.php?userid="+account+"&appid="+NimState.agentId)
+    return $.get(window.StarRtc.Instance.workServerUrl + "/authKey.php?userid=" + account + "&appid=" + NimState.agentId)
       .then((data, status) => {
-			if(status === "success"){
-				var obj = JSON.parse(data);
-				if(obj.status == 1){
-					return Promise.resolve(obj.data); 
-				}
-				else
-				{
-					return Promise.reject(obj.data);
-				}
-			}
-			else
-			{
-				return Promise.reject();
-			}
+        if (status === "success") {
+          var obj = JSON.parse(data);
+          if (obj.status == 1) {
+            return Promise.resolve(obj.data);
+          }
+          else {
+            return Promise.reject(obj.data);
+          }
+        }
+        else {
+          return Promise.reject();
+        }
       })
       .catch(err => {
         return Promise.reject(err);
       });
   },
-  
+
   // 初始化NIM SDK, 登录
   login(account, token, authKey = undefined) {
     const that = this;
-	if (NimState.nim) {
+    if (NimState.nim) {
       console.log('=== 已存在的nim实例， 不再重新初始化...');
       return Promise.resolve();
     }
-	
+
     if (!account || !token) {
       return Promise.reject("请输入登录名和密码");
     }
-	return new Promise((resolve ,reject) => {
-		if(authKey)
-		{
-			window.StarRtc.Instance.login(NimState.agentId,account,authKey,
-						(data, status) =>{
-							switch (status){
-							case "connect success":
-							NimAction.setNim(window.StarRtc.Instance);
-							NimAction.setAccount(account);
-							NimAction.setToken(token);
-							return resolve(authKey);
-							case "connect failed":
-							return reject("connect failed");
-							}
-						});
-		}
-		else
-		{
-			that.getAuthKey(account)
-			.then(authKey => {
-				window.StarRtc.Instance.login(NimState.agentId,account,authKey,
-						(data, status) =>{
-							switch (status){
-							case "connect success":
-							NimAction.setNim(window.StarRtc.Instance);
-							NimAction.setAccount(account);
-							NimAction.setToken(token);
-							return resolve(authKey);
-							case "connect failed":
-							return reject("connect failed");
-							}
-						});
-			})
-			.catch(err => {
-				return reject(err);
-			});
-		}
-	});
+    return new Promise((resolve, reject) => {
+      if (!window.StarRtc.Instance.configModePulic) {
+        window.StarRtc.Instance.login(NimState.agentId, account, authKey,
+          (data, status) => {
+            switch (status) {
+              case "connect success":
+                NimAction.setNim(window.StarRtc.Instance);
+                NimAction.setAccount(account);
+                NimAction.setToken(token);
+                return resolve(authKey);
+              case "connect failed":
+                return reject("connect failed");
+            }
+          });
+      }
+      else {
+        if (authKey) {
+          window.StarRtc.Instance.login(NimState.agentId, account, authKey,
+            (data, status) => {
+              switch (status) {
+                case "connect success":
+                  NimAction.setNim(window.StarRtc.Instance);
+                  NimAction.setAccount(account);
+                  NimAction.setToken(token);
+                  return resolve(authKey);
+                case "connect failed":
+                  return reject("connect failed");
+              }
+            });
+        }
+        else {
+          that.getAuthKey(account)
+            .then(authKey => {
+              window.StarRtc.Instance.login(NimState.agentId, account, authKey,
+                (data, status) => {
+                  switch (status) {
+                    case "connect success":
+                      NimAction.setNim(window.StarRtc.Instance);
+                      NimAction.setAccount(account);
+                      NimAction.setToken(token);
+                      return resolve(authKey);
+                    case "connect failed":
+                      return reject("connect failed");
+                  }
+                });
+            })
+            .catch(err => {
+              return reject(err);
+            });
+        }
+      }
+    });
   },
 
   onCustomSysMsg(msg) {
@@ -110,15 +122,15 @@ export default {
 
   //自定义IM消息
   sendCustomMsg(to, data) {
-    
+
   },
 
   sendCustomSysMsg(to, data) {
-    
+
   },
   //更新聊天室信息
   updateChatroom(data) {
-    
+
   },
   onMsg(msg) {
     console.log("收到im消息onMsg: ", msg);
@@ -146,16 +158,16 @@ export default {
 
     // 音视频本地行为(麦克风、摄像头、画面等)
     if (NetcallState.hasAudio && NetcallState.audio) {
-     
+
     }
     if (NetcallState.hasVideo && NetcallState.video) {
-     
+
     }
 
   },
 
   doEndInteraction4CurrentStudent() {
-	// 白板设置为观众
+    // 白板设置为观众
     EXT_WHITEBOARD.changeRoleToAudience();
     //本地行为及控制指令通知（麦克风、摄像头、画面）
     const findIdx = NetcallState.members.findIndex(item => {
@@ -175,9 +187,9 @@ export default {
 
   //退出NIM SDK
   logout() {
-	window.StarRtc.Instance.logout();
-	
-	NimAction.setAccount("");
+    window.StarRtc.Instance.logout();
+
+    NimAction.setAccount("");
     NimAction.setToken("");
 
     //原nim对象清除
@@ -185,7 +197,7 @@ export default {
 
     Storage.remove("account");
     Storage.remove("token");
-	Storage.remove("authKey");
+    Storage.remove("authKey");
 
     Page.to("login");
   }

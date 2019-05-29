@@ -7,7 +7,7 @@ import { observable, computed, action, configure } from 'mobx';
 
 import { Logger, Valid } from '../../util';
 
-configure({ enforceActions : 'always' });
+configure({ enforceActions: 'always' });
 
 console.log('Storage', Storage);
 console.log('Logger', Logger);
@@ -56,16 +56,16 @@ export default class {
     this.state.room = room;
     console.log('store --> room --> setRoom');
   }
-  
-  
-  
+
+
+
   @action
-  setShareStarted(shareStarted){
+  setShareStarted(shareStarted) {
     this.state.shareStarted = shareStarted;
     console.log('store --> chatroom --> setShareStarted', shareStarted);
   }
   @action
-  setChromeDown(chromeDown){
+  setChromeDown(chromeDown) {
     this.state.chromeDown = chromeDown;
     console.log('store --> chatroom --> setChromeDown', chromeDown);
   }
@@ -77,20 +77,20 @@ export default class {
   }
 
   @action
-  setHasVideo(hasVideo){
-    this.state.hasVideo=hasVideo;
+  setHasVideo(hasVideo) {
+    this.state.hasVideo = hasVideo;
     console.log('store --> netcall --> setHasVideo', hasVideo);
   }
 
   @action
-  setHasAudio(hasAudio){
-    this.state.hasAudio=hasAudio;
+  setHasAudio(hasAudio) {
+    this.state.hasAudio = hasAudio;
     console.log('store --> netcall --> setHasAudio', hasAudio);
   }
 
   @action
-  setHasShareScreen(hasShareScreen){
-    this.state.hasShareScreen=hasShareScreen;
+  setHasShareScreen(hasShareScreen) {
+    this.state.hasShareScreen = hasShareScreen;
     console.log('store --> netcall --> sethasShareScreen', hasShareScreen);
   }
 
@@ -103,7 +103,7 @@ export default class {
     );
   }
 
-  
+
   @action
   setScreenShareing4Local(screenShareing4Local) {
     this.state.screenShareing4Local = screenShareing4Local;
@@ -156,17 +156,17 @@ export default class {
   @action
   addDom(dom) {
     //忽略重复的对象追加
-    const addDomId = dom && dom.id ? dom.id:'';
-    if(!addDomId){
+    const addDomId = dom && dom.id ? dom.id : '';
+    if (!addDomId) {
       console.error('不存在的DOM节点或id属性：', addDomId);
       return;
     }
-    const existIdx  = this.state.doms.findIndex((item, index)=>{
-      if(item.id && item.id == addDomId){
+    const existIdx = this.state.doms.findIndex((item, index) => {
+      if (item.id && item.id == addDomId) {
         return index;
       }
     });
-    if(existIdx!=-1){
+    if (existIdx != -1) {
       console.error('已存在对应的DOM节点，不重复追加...', existIdx);
       return;
     }
@@ -243,15 +243,15 @@ export default class {
   /**
    * 是否可继续加人互动
    */
-  canAddNewMember(){
+  canAddNewMember() {
     let existMemberCount = 0;
-    this.state.members.forEach(item=>{
-      if(item.account && item.account!=''){
-        existMemberCount +=1;
+    this.state.members.forEach(item => {
+      if (item.account && item.account != '') {
+        existMemberCount += 1;
       }
     });
-    console.log('是否可继续加人互动：', existMemberCount , existMemberCount == 4);
-    return existMemberCount== 4;
+    console.log('是否可继续加人互动：', existMemberCount, existMemberCount == 4);
+    return existMemberCount == 4;
   }
   @action
   addMember(member, isTeacher, offline) {

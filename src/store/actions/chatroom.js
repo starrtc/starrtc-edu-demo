@@ -8,7 +8,7 @@ import { observable, computed, action, configure } from "mobx";
 import defaultConfig from "../config";
 import { Valid } from "../../util";
 
-configure({ enforceActions : 'always' });
+configure({ enforceActions: 'always' });
 
 export default class {
   @observable
@@ -23,16 +23,17 @@ export default class {
     msgs: [], //聊天室的聊天消息列表
     members: [], //聊天室成员列表{type,account, nick, avatar,status,enterTime, audioVolume}
     type: "", //当前用户类型(与聊天室成员的type值一致)
-    custom: {} // 聊天室信息
+    custom: {}, // 聊天室信息
+    rooms: [] //房间列表
   };
 
   @action
-  setLastTimestamp(lastTimestamp){
+  setLastTimestamp(lastTimestamp) {
     this.state.lastTimestamp = lastTimestamp;
     console.log('store --> chatroom --> setLastTimestamp', lastTimestamp);
   }
   @action
-  setCustom(custom){
+  setCustom(custom) {
     this.state.custom = custom
     console.log('store --> chatroom --> setCustom', custom)
   }
@@ -66,7 +67,7 @@ export default class {
    * 是否还有成员请求连麦
    */
   hasPermissionRequestMember() {
-    let idx = this.state.members.findIndex(function(element, index) {
+    let idx = this.state.members.findIndex(function (element, index) {
       return element.status == 2; //请求连麦
     });
     return idx != -1;
@@ -148,7 +149,7 @@ export default class {
   }
 
   findMember(member) {
-    let idx = this.state.members.findIndex(function(element, index) {
+    let idx = this.state.members.findIndex(function (element, index) {
       return member.account == element.account;
     });
 
@@ -234,7 +235,7 @@ export default class {
     // 忽略不存在的成员
     let findIdx = this.findMember({ account: account });
     if (findIdx == -1) {
-  
+
       return;
     }
 
@@ -287,5 +288,22 @@ export default class {
 
     this.state.members = newarray;
     console.log("store --> chatroom --> resortMemberLocation", newarray);
+  }
+
+  @action
+  setRooms(rooms) {
+    if (!rooms) {
+      return;
+    }
+
+    if (!Valid.isArray(rooms)) {
+      console.error("非成员数组", rooms);
+      return;
+    }
+
+    //新成员追加在尾部
+    this.state.rooms = rooms;
+
+    console.log("store --> chatroom --> setRooms", rooms);
   }
 }

@@ -37,17 +37,16 @@ export default class Login extends Component {
   }
 
   autoLogin() {
-    
-	if (NimState.nim)
-	{
-		Page.to('home');
-	}
+
+    if (NimState.nim) {
+      Page.to('home');
+    }
 
     console.log('login:开始自动登录nim过程...');
 
     const account = Storage.get('account');
     const token = Storage.get('token');
-	const authKey = Storage.get('authKey');
+    const authKey = Storage.get('authKey');
     if (!account || !token) {
       console.error('login:自动登录nim:缺少account或token');
       this.accountInput.focus();
@@ -59,11 +58,11 @@ export default class Login extends Component {
       errorTip: '',
       loginLoading: true
     });
-	
-	this.requestLogin({
+
+    this.requestLogin({
       account: account,
       pwd: token,
-	  authKey:authKey
+      authKey: authKey
     });
 
   }
@@ -149,28 +148,27 @@ export default class Login extends Component {
   requestLogin(data) {
     const account = data.account;
     const token = MD5(data.pwd);
-	const key = data.authKey;
-	EXT_NIM.login(account, token, key)
-	.then((authKey) =>{
-		Storage.set('account', data.account);
-		Storage.set('token', token);
-		Storage.set('authKey', authKey);
-		Page.to('home');
-	})
-	.catch(err =>
-	{
-		Storage.remove('account');
-		Storage.remove('token');
-		Storage.remove('authKey');
-		
-		this.setState({
-			showErrorTip: true,
-			errorTip: '',
-			loginLoading: false
-		});
-		
-		console.log(err);
-	});
+    const key = data.authKey;
+    EXT_NIM.login(account, token, key)
+      .then((authKey) => {
+        Storage.set('account', data.account);
+        Storage.set('token', token);
+        Storage.set('authKey', authKey);
+        Page.to('home');
+      })
+      .catch(err => {
+        Storage.remove('account');
+        Storage.remove('token');
+        Storage.remove('authKey');
+
+        this.setState({
+          showErrorTip: true,
+          errorTip: '',
+          loginLoading: false
+        });
+
+        console.log(err);
+      });
 
   }
 

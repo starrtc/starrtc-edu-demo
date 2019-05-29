@@ -31,7 +31,7 @@ export default class extends Component {
 
 
     //通知请求者结果【关闭】连麦
-	EXT_ROOM.sendLinkStopMsg(account);
+    EXT_ROOM.sendLinkStopMsg(account);
   };
 
   //结束成员的互动
@@ -141,59 +141,59 @@ export default class extends Component {
                     }}
                   />
                 ) : (
-                  <div className="avatar" />
-                )}
+                    <div className="avatar" />
+                  )}
                 <div className="nickname">
                   {item.nick}
                 </div>
               </div>
             ) : (
-              <div key={index} className="u-member">
-                <div
-                  className={classNames(
-                    "volume",
-                    this.getVolume(item.audioVolume)
-                  )}
-                />
-                {item.avatar ? (
+                <div key={index} className="u-member">
                   <div
-                    className="avatar"
-                    style={{
-                      backgroundImage: "url(" + item.avatar + ")"
-                    }}
+                    className={classNames(
+                      "volume",
+                      this.getVolume(item.audioVolume)
+                    )}
                   />
-                ) : (
-                  <div className="avatar" />
-                )}
-                <div className="nickname">
-                  {item.nick}
-                </div>
-                <div className="opt">
-                  {isTeacher == 1 &&
-                    item.status == 1 && (
-                      <div
-                        className="button button-end"
-                        onClick={this.endInteraction.bind(this, item.account)}
-                      >
-                        结束互动
+                  {item.avatar ? (
+                    <div
+                      className="avatar"
+                      style={{
+                        backgroundImage: "url(" + item.avatar + ")"
+                      }}
+                    />
+                  ) : (
+                      <div className="avatar" />
+                    )}
+                  <div className="nickname">
+                    {item.nick}
+                  </div>
+                  <div className="opt">
+                    {isTeacher == 1 &&
+                      item.status == 1 && (
+                        <div
+                          className="button button-end"
+                          onClick={this.endInteraction.bind(this, item.account)}
+                        >
+                          结束互动
                       </div>
-                    )}
-                  {isTeacher == 1 &&
-                    item.status == 2 && (
-                      <div
-                        className="button"
-                        onClick={this.allowInteraction.bind(this, item.account)}
-                      >
-                        允许互动
+                      )}
+                    {isTeacher == 1 &&
+                      item.status == 2 && (
+                        <div
+                          className="button"
+                          onClick={this.allowInteraction.bind(this, item.account)}
+                        >
+                          允许互动
                       </div>
-                    )}
-                  {isTeacher == 0 &&
-                    item.status == 1 && (
-                      <div className="interaction-msg">互动中...</div>
-                    )}
+                      )}
+                    {isTeacher == 0 &&
+                      item.status == 1 && (
+                        <div className="interaction-msg">互动中...</div>
+                      )}
+                  </div>
                 </div>
-              </div>
-            )
+              )
         )}
       </div>
     );

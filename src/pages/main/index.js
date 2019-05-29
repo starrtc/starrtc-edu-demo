@@ -42,13 +42,13 @@ class Main extends Component {
     NetcallAction.setShowStatus(0);
     this.autoLogin();
   }
-  
+
   autoLogin = () => {
     //检测当前机器的可用设备
     console.log("检测当前机器的可用设备....");
-	NetcallAction.setHasAudio(true);
+    NetcallAction.setHasAudio(true);
     NetcallAction.setHasVideo(true);
-   
+
     // 初始化屏幕共享状态
     NetcallAction.settabindex(0);
     NetcallAction.setShareStarted(false);
@@ -61,28 +61,27 @@ class Main extends Component {
 
     const account = Storage.get("account");
     const token = Storage.get("token");
-	const authKey = Storage.get('authKey');
+    const authKey = Storage.get('authKey');
     if (!account || !token) {
       console.error("main:自动登录nim:缺少account或token");
       Page.to("login");
       return;
     }
 
-	EXT_NIM.login(account, token)
-	.then((key) =>{
-		console.log("main:自动登录nim成功");
-		Storage.set('account', account);
-		Storage.set('token', token);
-		Storage.set('authKey', authKey);
+    EXT_NIM.login(account, token)
+      .then((key) => {
+        console.log("main:自动登录nim成功");
+        Storage.set('account', account);
+        Storage.set('token', token);
+        Storage.set('authKey', authKey);
         //继续登录聊天室
         this.autoLoginChatroom();
-	})
-	.catch(err =>
-	{
-		console.error("main:自动登录nim失败");
+      })
+      .catch(err => {
+        console.error("main:自动登录nim失败");
 
         Page.to("login", err);
-	});
+      });
   };
 
   autoLoginChatroom = () => {
@@ -92,8 +91,8 @@ class Main extends Component {
       return;
     }
     console.log("main:开始自动登录chatroom过程...");
-	Page.to("home");
-	
+    Page.to("home");
+
   }
 
   doRtcAndWB = () => {
@@ -111,23 +110,23 @@ class Main extends Component {
 
   autoLoginWebRtc = () => {
     //未实例化WEBRTC实例，则先初始化
-   
-    //解决老师重新登录后的状态问题
-   
-		var type = NimState.nim.getInfo().userId == NetcallState.room.getUserData().roomInfo.Creator ? "owner" : "other";
-        ChatroomAction.setType(type);
 
-        const isTeacher = type == "owner";
-        this.joinChannelRtc(ChatroomState.currChatroomId, isTeacher);
-    
+    //解决老师重新登录后的状态问题
+
+    var type = NimState.nim.getInfo().userId == NetcallState.room.getUserData().roomInfo.Creator ? "owner" : "other";
+    ChatroomAction.setType(type);
+
+    const isTeacher = type == "owner";
+    this.joinChannelRtc(ChatroomState.currChatroomId, isTeacher);
+
   };
   // 加入RTC房间
   joinChannelRtc = (roomId, isTeacher) => {
     console.log("===  开始加入RTC房间");
-    
 
-        isTeacher == 1 ? this.doRtcTask4Teacher() : this.doRtcTask4Student();
-     
+
+    isTeacher == 1 ? this.doRtcTask4Teacher() : this.doRtcTask4Student();
+
   };
 
   autoLoginWhiteBoard = () => {
@@ -188,18 +187,18 @@ class Main extends Component {
 
     //一系列流程（麦克风、摄像头，开启连接）
     if (NetcallState.hasAudio && NetcallState.audio) {
-     
+
     }
 
     if (NetcallState.hasVideo && NetcallState.video) {
-		
-		console.log("===摄像头启动成功");
-		const dom = NetcallState.doms[0];
-		console.log("当前人员加入节点：", dom);
 
-		EXT_ROOM.startLocalStream(dom);
-		
-     
+      console.log("===摄像头启动成功");
+      const dom = NetcallState.doms[0];
+      console.log("当前人员加入节点：", dom);
+
+      EXT_ROOM.startLocalStream(dom);
+
+
     }
 
 
@@ -207,7 +206,7 @@ class Main extends Component {
   //学生RTC房间行为
   doRtcTask4Student = () => {
     console.log("学生处理RTC...");
-   
+
   };
   //老师白板房间行为
   doWbTask4Teacher = () => {
@@ -221,7 +220,7 @@ class Main extends Component {
     // 根据角色设置默认画笔颜色
     EXT_WHITEBOARD.setColor("#35CBFF");
   };
-  
+
   createChannelWb = (roomId) => {
     EXT_WHITEBOARD.createChannel(roomId)
       .then(obj => {
@@ -235,48 +234,48 @@ class Main extends Component {
   };
 
   request = e => {
-		this.setState({
-		  requesting: true
-		});
-		
-		EXT_ROOM.sendApplyMsg()
-		.then(() => {
-			 //变成请求状态
-			NetcallAction.setShowStatus(1);
-			this.setState({
-			  requesting: false
-			});
-		})
-		.catch(err => {
-			console.error("发送请求取消连麦消息失败", err);
+    this.setState({
+      requesting: true
+    });
 
-			NetcallAction.setShowStatus(0);
-			this.setState({
-			  requesting: false
-			});
-		});
-		
-  };
-
-  cancleRequest = e => {
-		NetcallAction.setShowStatus(0);
+    EXT_ROOM.sendApplyMsg()
+      .then(() => {
+        //变成请求状态
+        NetcallAction.setShowStatus(1);
         this.setState({
           requesting: false
         });
+      })
+      .catch(err => {
+        console.error("发送请求取消连麦消息失败", err);
+
+        NetcallAction.setShowStatus(0);
+        this.setState({
+          requesting: false
+        });
+      });
+
+  };
+
+  cancleRequest = e => {
+    NetcallAction.setShowStatus(0);
+    this.setState({
+      requesting: false
+    });
   };
 
   doStopInteraction = () => {
     console.log("【停止互动确认弹窗】--> 确定...");
     Alert.close();
-	
-	EXT_ROOM.doLinkStop().then(() => {
-		 //变成请求状态
-        NetcallAction.setShowStatus(0);
 
-        this.setState({
-          requesting: false
-        });
-	});
+    EXT_ROOM.doLinkStop().then(() => {
+      //变成请求状态
+      NetcallAction.setShowStatus(0);
+
+      this.setState({
+        requesting: false
+      });
+    });
   };
   doCancle = () => {
     console.log("【停止互动确认弹窗】--> 取消...");
@@ -309,7 +308,7 @@ class Main extends Component {
   };
 
   findOwnerIdx() {
-    
+
   }
 
   closeDeviceDisabledTip = () => {

@@ -10,4 +10,4 @@ const StoreNetcall = window.SNC = new Netcall();
 const StoreWhiteBoard = window.SWB = new WhiteBoard();
 const StoreEventPool = window.SEP = new EventPool();
 
-export { StoreNim, StoreChatroom, StoreNetcall, StoreWhiteBoard,StoreEventPool };
+export { StoreNim, StoreChatroom, StoreNetcall, StoreWhiteBoard, StoreEventPool };

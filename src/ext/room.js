@@ -27,42 +27,39 @@ const EventPoolState = StoreEventPool.state;
 // SDK插件注册
 
 export default {
-  async createRoom(roomName, userId, joinFlag = false) {
-    const that = this;
-    const isTeacher = Number(Storage.get("isTeacher"));
-    var roomInfo = {};
-    if (joinFlag) {
-      try {
-        let ret = await new Promise((resolve, reject) => {
-          $.get(window.StarRtc.Instance.workServerUrl + "/class/info?uuid=" + roomName)
-            .then((data, status) => {
-              if (status === "success") {
-                var obj = JSON.parse(data);
-                if (obj.status == 1) {
-                  roomInfo.ID = roomName;
-                  roomInfo.Creator = obj.data.userId;
-                  roomInfo.Name = obj.data.name;
-                  resolve();
-                }
-                else {
-                  return reject(obj.data);
-                }
-              }
-              else {
-                return reject("请求房间信息失败！");
-              }
-            })
-            .catch(err => {
-              return reject(err);
-            });
+  getClassRoomList() {
+    return new Promise((resolve, reject) => {
+      if (window.StarRtc.Instance.configModePulic) {
+        $.get(window.StarRtc.Instance.workServerUrl + "/class/list.php?appid=" + NimState.agentId).then((data, status) => {
+          if (status === "success") {
+            var obj = JSON.parse(data);
+            if (obj.status === 1) {
+              ChatroomAction.setRooms(obj.data);
+              resolve();
+            } else {
+              reject();
+            }
+          } else {
+            reject();
+          }
         });
       }
-      catch (err) {
-        return Promise.reject(err);
+      else {
+        window.StarRtc.Instance.queryVideoClassRoom((status, listData) => {
+          ChatroomAction.setRooms(listData);
+          resolve();
+        });
       }
+    });
+  },
+
+  async createRoom(roomInfo, userId, joinFlag = false) {
+    const that = this;
+    const isTeacher = Number(Storage.get("isTeacher"));
+    if (joinFlag) {
+
     }
     else {
-      roomInfo.Name = roomName;
       roomInfo.Type = 0;
       roomInfo.ID = "";
     }
@@ -179,7 +176,12 @@ export default {
                     break;
                   case "createChannel":
                     if (data.status == "success") {
-                      $.get(starRtc.workServerUrl + "/class/store?appid=" + NimState.agentId + "&ID=" + data.userData.roomInfo.ID + "&Name=" + data.userData.roomInfo.Name + "&Creator=" + data.userData.roomInfo.Creator);
+                      if (window.StarRtc.Instance.configModePulic) {
+                        $.get(starRtc.workServerUrl + "/class/store?appid=" + NimState.agentId + "&ID=" + data.userData.roomInfo.ID + "&Name=" + data.userData.roomInfo.Name + "&Creator=" + data.userData.roomInfo.Creator);
+                      }
+                      else {
+                        window.StarRtc.Instance.reportVideoClassRoom(data.userData.roomInfo, null);
+                      }
                       thisRoom.createStream();
                     }
                     else {
@@ -228,40 +230,8 @@ export default {
 
   },
 
-  async joinRoom(roomId, userId) {
+  async joinRoom(roomInfo, userId) {
     const that = this;
-    var roomInfo = {};
-
-    try {
-
-      let ret = await new Promise((resolve, reject) => {
-        $.get(window.StarRtc.Instance.workServerUrl + "/class/info?uuid=" + roomId)
-          .then((data, status) => {
-            if (status === "success") {
-              var obj = JSON.parse(data);
-              if (obj.status == 1) {
-                roomInfo.ID = roomId;
-                roomInfo.Creator = obj.data.userId;
-                roomInfo.Name = obj.data.name;
-                resolve();
-              }
-              else {
-                return reject(obj.data);
-              }
-            }
-            else {
-              return reject("请求房间信息失败！");
-            }
-          })
-          .catch(err => {
-            return reject(err);
-          });
-      });
-    }
-    catch (err) {
-      return Promise.reject(err);
-    }
-
     return new Promise((resolve, reject) => {
       var starRtc = NimState.nim;
 
@@ -440,7 +410,7 @@ export default {
         currRoom.sigDisconnect();
       }
 
-      this.joinRoom(ChatroomState.currChatroomId, NimState.account)
+      this.joinRoom(currRoom.getUserData().roomInfo, NimState.account)
         .then(() => {
 
           const index = NetcallAction.findMember({
@@ -528,7 +498,7 @@ export default {
         currRoom.sigDisconnect();
       }
 
-      this.createRoom(ChatroomState.currChatroomId, "", true)
+      this.createRoom(currRoom.getUserData().roomInfo, "", true)
         .then(() => {
 
           NetcallAction.addMember(
