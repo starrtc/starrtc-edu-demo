@@ -259,6 +259,7 @@ export default class {
     if (idx != -1) {
       console.log("已存在的音视频成员", member);
 
+      this.state.members[idx] = member;
       //如果是老师则设置对应在线状态
       if (isTeacher) {
         console.log("额外设置老师状态...");

@@ -98,9 +98,25 @@ class Main extends Component {
   doRtcAndWB = () => {
     //初始化RTC房间节点
     NetcallAction.addDom(document.getElementById("video-1"));
+    if(NetcallState.members[0] !== undefined && NetcallState.members[0].streamObj !== undefined)
+    {
+      EXT_ROOM.startRemoteStream(NetcallState.members[0].account, NetcallState.doms[0], NetcallState.members[0].streamObj );
+    }
     NetcallAction.addDom(document.getElementById("video-2"));
+    if(NetcallState.members[1] !== undefined && NetcallState.members[1].streamObj !== undefined)
+    {
+      EXT_ROOM.startRemoteStream(NetcallState.members[1].account, NetcallState.doms[1], NetcallState.members[1].streamObj );
+    }
     NetcallAction.addDom(document.getElementById("video-3"));
+    if(NetcallState.members[2] !== undefined && NetcallState.members[2].streamObj !== undefined)
+    {
+      EXT_ROOM.startRemoteStream(NetcallState.members[2].account, NetcallState.doms[2], NetcallState.members[2].streamObj );
+    }
     NetcallAction.addDom(document.getElementById("video-4"));
+    if(NetcallState.members[3] !== undefined && NetcallState.members[3].streamObj !== undefined)
+    {
+      EXT_ROOM.startRemoteStream(NetcallState.members[3].account, NetcallState.doms[3], NetcallState.members[3].streamObj );
+    }
 
     //继续webrtc登录
     this.autoLoginWebRtc();

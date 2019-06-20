@@ -408,20 +408,20 @@ export default {
       if (currRoom) {
         currRoom.leaveRoom();
         currRoom.sigDisconnect();
+
+        const index = NetcallAction.findMember({
+          account: NimState.account
+        });
+
+        this.stopLocalStream(NetcallState.doms[index]);
+
+        NetcallAction.delMember(NimState.account);
+
+        this.stopAllRemoteStream();
       }
 
       this.joinRoom(currRoom.getUserData().roomInfo, NimState.account)
         .then(() => {
-
-          const index = NetcallAction.findMember({
-            account: NimState.account
-          });
-
-          this.stopLocalStream(NetcallState.doms[index]);
-
-          NetcallAction.delMember(NimState.account);
-
-          this.stopAllRemoteStream();
 
           NetcallAction.setHasPermission(false);
 
@@ -496,6 +496,9 @@ export default {
       if (currRoom) {
         currRoom.leaveRoom();
         currRoom.sigDisconnect();
+
+        this.stopAllRemoteStream();
+
       }
 
       this.createRoom(currRoom.getUserData().roomInfo, "", true)
@@ -509,8 +512,6 @@ export default {
             false,
             false
           );
-
-          this.stopAllRemoteStream();
 
           NetcallAction.setHasPermission(true);
           // 白板本地行为
@@ -1147,6 +1148,7 @@ export default {
 
   //预览远程视频流
   startRemoteStream(account, node, streamObj) {
+    if(node === undefined) return;
     var vNode = this.createVideoDomNode(node, "");
     vNode.srcObject = streamObj;
   },
