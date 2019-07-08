@@ -61,7 +61,6 @@ class Main extends Component {
 
     const account = Storage.get("account");
     const token = Storage.get("token");
-    const authKey = Storage.get('authKey');
     if (!account || !token) {
       console.error("main:自动登录nim:缺少account或token");
       Page.to("login");
@@ -69,11 +68,10 @@ class Main extends Component {
     }
 
     EXT_NIM.login(account, token)
-      .then((key) => {
+      .then(() => {
         console.log("main:自动登录nim成功");
         Storage.set('account', account);
         Storage.set('token', token);
-        Storage.set('authKey', authKey);
         //继续登录聊天室
         this.autoLoginChatroom();
       })
@@ -129,7 +127,7 @@ class Main extends Component {
 
     //解决老师重新登录后的状态问题
 
-    var type = NimState.nim.getInfo().userId == NetcallState.room.getUserData().roomInfo.Creator ? "owner" : "other";
+    var type = NimState.nim.starUser.userId == NetcallState.room.getUserData().roomInfo.creator ? "owner" : "other";
     ChatroomAction.setType(type);
 
     const isTeacher = type == "owner";

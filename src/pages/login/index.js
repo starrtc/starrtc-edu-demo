@@ -46,7 +46,6 @@ export default class Login extends Component {
 
     const account = Storage.get('account');
     const token = Storage.get('token');
-    const authKey = Storage.get('authKey');
     if (!account || !token) {
       console.error('login:自动登录nim:缺少account或token');
       this.accountInput.focus();
@@ -61,8 +60,7 @@ export default class Login extends Component {
 
     this.requestLogin({
       account: account,
-      pwd: token,
-      authKey: authKey
+      pwd: token
     });
 
   }
@@ -148,18 +146,15 @@ export default class Login extends Component {
   requestLogin(data) {
     const account = data.account;
     const token = MD5(data.pwd);
-    const key = data.authKey;
-    EXT_NIM.login(account, token, key)
-      .then((authKey) => {
+    EXT_NIM.login(account, token)
+      .then(() => {
         Storage.set('account', data.account);
         Storage.set('token', token);
-        Storage.set('authKey', authKey);
         Page.to('home');
       })
       .catch(err => {
         Storage.remove('account');
         Storage.remove('token');
-        Storage.remove('authKey');
 
         this.setState({
           showErrorTip: true,

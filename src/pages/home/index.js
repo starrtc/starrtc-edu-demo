@@ -60,18 +60,16 @@ export default class Home extends Component {
 
     const account = Storage.get("account");
     const token = Storage.get("token");
-    const authKey = Storage.get('authKey');
     if (!account || !token) {
       console.error("home:自动登录nim:缺少account或token");
       Page.to("login");
       return;
     }
 
-    EXT_NIM.login(account, token, authKey)
-      .then((key) => {
+    EXT_NIM.login(account, token)
+      .then(() => {
         Storage.set('account', account);
         Storage.set('token', token);
-        Storage.set('authKey', authKey);
         EXT_ROOM.getClassRoomList();
       })
       .catch(err => {
@@ -138,7 +136,7 @@ export default class Home extends Component {
         "index": index,
         "info": ChatroomState.rooms[index]
       },
-      roomId: ChatroomState.rooms[index]["Name"],
+      roomId: ChatroomState.rooms[index]["name"],
       canJoin: true
     });
   }
@@ -176,7 +174,7 @@ export default class Home extends Component {
     const account = Storage.get("account");
     const that = this;
 
-    EXT_ROOM.createRoom({ "Name": this.state.roomName }, account)
+    EXT_ROOM.createRoom({ "name": this.state.roomName }, account)
       .then(id => {
         Storage.set("teacherAccount", NimState.account);
         Storage.set("roomId", id);
@@ -279,7 +277,7 @@ export default class Home extends Component {
               {ChatroomState.rooms.map(
                 (item, index) => (
                   <Row key={index}>
-                    <Col className="m-list-item m-list-item2" span={1} onClick={this.selectRoom.bind(this, index)}>{item.Name}</Col>
+                    <Col className="m-list-item m-list-item2" span={1} onClick={this.selectRoom.bind(this, index)}>{item.name}</Col>
                   </Row>
                 ))}
             </div>

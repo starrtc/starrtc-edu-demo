@@ -29,12 +29,18 @@ const EventPoolState = StoreEventPool.state;
 export default {
   getClassRoomList() {
     return new Promise((resolve, reject) => {
-      if (window.StarRtc.Instance.configModePulic) {
-        $.get(window.StarRtc.Instance.workServerUrl + "/class/list.php?appid=" + NimState.agentId).then((data, status) => {
+      var listTypes = [window.StarRtc.CHATROOM_LIST_TYPE.CHATROOM_LIST_TYPE_CLASS, window.StarRtc.CHATROOM_LIST_TYPE.CHATROOM_LIST_TYPE_CLASS_PUSH];
+      if (window.StarRtc.Instance.starConfig.configUseAEC) {
+        $.get(window.aecRequestBaseURL + "/list/query.php?listTypes=" + listTypes.join(",")).then((data, status) => {
           if (status === "success") {
             var obj = JSON.parse(data);
             if (obj.status === 1) {
-              ChatroomAction.setRooms(obj.data);
+              var classRooms = [];
+              for (var i = 0; i < obj.data.length; i++) {
+                var item = JSON.parse(decodeURIComponent(obj.data[i].data));
+                classRooms.push(item);
+              }
+              ChatroomAction.setRooms(classRooms);
               resolve();
             } else {
               reject();
@@ -45,7 +51,7 @@ export default {
         });
       }
       else {
-        window.StarRtc.Instance.queryVideoClassRoom((status, listData) => {
+        window.StarRtc.Instance.queryRoom(listTypes, (status, listData) => {
           ChatroomAction.setRooms(listData);
           resolve();
         });
@@ -61,7 +67,7 @@ export default {
     }
     else {
       roomInfo.Type = 0;
-      roomInfo.ID = "";
+      roomInfo.id = "";
     }
 
     return new Promise((resolve, reject) => {
@@ -111,17 +117,17 @@ export default {
                     if (data.status == "success") {
                       ChatroomAction.addMember(
                         that.createMember4Component(
-                          NimState.account == data.userData.roomInfo.Creator ? "owner" : "guest",
+                          NimState.account == data.userData.roomInfo.creator ? "owner" : "guest",
                           NimState.account,
                           "",
                           NimState.account,
                           ""
                         )
                       );
-                      ChatroomAction.setChatroom(data.userData.roomInfo.ID, currRoom);
-                      ChatroomAction.setCurrChatroomId(data.userData.roomInfo.ID);
+                      ChatroomAction.setChatroom(data.userData.roomInfo.id, currRoom);
+                      ChatroomAction.setCurrChatroomId(data.userData.roomInfo.id);
                       NetcallAction.setRoom(currRoom);
-                      resolve(data.userData.roomInfo.ID);
+                      resolve(data.userData.roomInfo.id);
                     }
                     else {
                       reject("上传视频申请失败！");
@@ -131,7 +137,7 @@ export default {
                   case "addUploader":
 
                     var upUserId = that.getIdWithOutAgentId(data.upUserId);
-                    var owner = data.userData.roomInfo.Creator == upUserId;
+                    var owner = data.userData.roomInfo.creator == upUserId;
                     ChatroomAction.addMember(
                       that.createMember4Component(
                         owner ? "owner" : "guest",
@@ -176,11 +182,25 @@ export default {
                     break;
                   case "createChannel":
                     if (data.status == "success") {
-                      if (window.StarRtc.Instance.configModePulic) {
-                        $.get(starRtc.workServerUrl + "/class/store?appid=" + NimState.agentId + "&ID=" + data.userData.roomInfo.ID + "&Name=" + data.userData.roomInfo.Name + "&Creator=" + data.userData.roomInfo.Creator);
+                      if (window.StarRtc.Instance.starConfig.configUseAEC) {
+                        $.get(window.aecRequestBaseURL + "/list/save.php?userId=" + window.StarRtc.Instance.starUser.userId + "&listType=" + window.StarRtc.CHATROOM_LIST_TYPE.CHATROOM_LIST_TYPE_CLASS.toString() + "&roomId=" + data.userData.roomInfo.id + "&data=" + encodeURIComponent(JSON.stringify(data.userData.roomInfo)), function (data, status) {
+                          if (status === "success") {
+                            var obj = JSON.parse(data);
+                            if (obj.status == 1) {
+                              console.log("保存成功")
+                            } else {
+                              console.log("保存失败")
+                            }
+                          } else {
+                            console.log("保存失败")
+                          }
+                        });
                       }
                       else {
-                        window.StarRtc.Instance.reportVideoClassRoom(data.userData.roomInfo, null);
+                        //仅供测试使用
+                        window.StarRtc.Instance.reportRoom(window.StarRtc.CHATROOM_LIST_TYPE.CHATROOM_LIST_TYPE_CLASS.toString(), data.userData.roomInfo, function (status) {
+                          console.log("保存" + status);
+                        });
                       }
                       thisRoom.createStream();
                     }
@@ -266,8 +286,8 @@ export default {
                   break;
                 case "vdnApplyDownload":
                   if (data.status == "success") {
-                    ChatroomAction.setChatroom(data.userData.roomInfo.ID, currRoom);
-                    ChatroomAction.setCurrChatroomId(data.userData.roomInfo.ID);
+                    ChatroomAction.setChatroom(data.userData.roomInfo.id, currRoom);
+                    ChatroomAction.setCurrChatroomId(data.userData.roomInfo.id);
                     NetcallAction.setRoom(currRoom);
                     resolve();
                   }
@@ -280,7 +300,7 @@ export default {
                 case "addUploader":
 
                   var upUserId = that.getIdWithOutAgentId(data.upUserId);
-                  var owner = data.userData.roomInfo.Creator == upUserId;
+                  var owner = data.userData.roomInfo.creator == upUserId;
                   ChatroomAction.addMember(
                     that.createMember4Component(
                       owner ? "owner" : "guest",
@@ -1148,7 +1168,7 @@ export default {
 
   //预览远程视频流
   startRemoteStream(account, node, streamObj) {
-    if(node === undefined) return;
+    if (node === undefined) return;
     var vNode = this.createVideoDomNode(node, "");
     vNode.srcObject = streamObj;
   },

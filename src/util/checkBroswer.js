@@ -42,7 +42,6 @@ export default function({ success, fail }) {
 }
 
 function check() {
-
   return Promise.resolve();
 }
 
