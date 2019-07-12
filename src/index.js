@@ -19,7 +19,7 @@ var privateURL = "demo.starrtc.com";
 
 window.aecRequestBaseURL = "https://www.starrtc.com/aec";
 
-window.StarRtc.Instance.setConfigUseAEC(true);    							//是否开启AEC
+//window.StarRtc.Instance.setConfigUseAEC(true);    							//是否开启AEC
 
 window.StarRtc.Instance.setMsgServerInfo(privateURL, 19903) 					//ip, websocket port  //需要手动从浏览器输入 https://ip:29991 信任证书
 
