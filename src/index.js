@@ -16,6 +16,7 @@ window.DrawPlugin = DrawPlugin;
 ///////////////////////以下privateURL需替换为私有部署IP////
 
 var privateURL = "demo.starrtc.com";
+var webrtcIP = "123.103.93.74";	
 
 window.aecRequestBaseURL = "https://www.starrtc.com/aec";
 
@@ -25,11 +26,11 @@ window.StarRtc.Instance.setMsgServerInfo(privateURL, 19903) 					//ip, websocket
 
 window.StarRtc.Instance.setChatRoomServerInfo(privateURL, 19906) 			//ip, websocket port //需要手动从浏览器输入 https://ip:29993 信任证书
 
-window.StarRtc.Instance.setSrcServerInfo(privateURL, 19934, 19935)  			//ip, websocket port, webrtc port //需要手动从浏览器输入 https://ip:29994 信任证书
+window.StarRtc.Instance.setSrcServerInfo(privateURL, 19934, 19935, webrtcIP)  			//ip, websocket port, webrtc port, webrtc ip//需要手动从浏览器输入 https://ip:29994 信任证书
 
-window.StarRtc.Instance.setVdnServerInfo(privateURL, 19940, 19941) 			//ip, websocket port, webrtc port //需要手动从浏览器输入 https://ip:29995 信任证书
+window.StarRtc.Instance.setVdnServerInfo(privateURL, 19940, 19941, webrtcIP) 			//ip, websocket port, webrtc port, webrtc ip //需要手动从浏览器输入 https://ip:29995 信任证书
 
-window.StarRtc.Instance.setVoipServerInfo(privateURL, 10086, 10087, 10088) 	//ip, voipServer port, websocket port, webrtc port //需要手动从浏览器输入 https://ip:29992 信任证书
+window.StarRtc.Instance.setVoipServerInfo(privateURL, 10086, 10087, 10088, webrtcIP) 	//ip, voipServer port, websocket port, webrtc port, webrtc ip //需要手动从浏览器输入 https://ip:29992 信任证书
 
 ReactDOM.render(<App />, document.getElementById('root'));
 registerServiceWorker();
