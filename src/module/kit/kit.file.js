@@ -165,7 +165,7 @@ export default class extends Component {
                 }}
               />
             )}
-			<form id="uploadForm" name="form2" encType="multipart/form-data" method="post" action="https://api.starrtc.com/demo/upload_api">
+			<form id="uploadForm" name="form2" encType="multipart/form-data" method="post" action={window.aecRequestBaseURL + "/doc/upload.php"}>
             <Input
               domRef={input => {
                 if (input) {

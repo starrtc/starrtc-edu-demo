@@ -39,8 +39,8 @@ export default {
     })
     this.drawPlugin.on('data', (obj) => {
       let { toAccount = 0, data } = obj
-      if (!data) return
-	  EXT_ROOM.sendStreamData(JSON.stringify({"account":toAccount, "data":data}));
+      if (!data) return;
+      EXT_ROOM.sendStreamData(JSON.stringify({ "account": toAccount, "data": data }));
     })
   },
   bindEvent() {
@@ -51,7 +51,7 @@ export default {
     console.log('wb::createChannel', roomId);
   },
   _startSession() {
-    
+
   },
   clearAll() {
 
@@ -62,7 +62,7 @@ export default {
     this.drawPlugin = null
   },
   joinChannel(roomId) {
-   
+
     console.log('wb::joinChannel', roomId);
     this.info = {
       channelName: roomId,
@@ -71,15 +71,15 @@ export default {
 
       }
     };
-    
-	  return Promise.resolve();
+
+    return Promise.resolve();
   },
   _joinChannel() {
-   
+
   },
   leaveChannel() {
     console.log('wb::leaveChannel');
-  
+
     StoreWhiteBoard.reset();
   },
   // 延迟分角色加载
@@ -135,12 +135,12 @@ export default {
     this.drawPlugin && this.drawPlugin.changeRoleToPlayer();
   },
   // 设置绘图模式: 激光笔
-  setDrawModeFlag: function() {
+  setDrawModeFlag: function () {
     this.drawPlugin && this.drawPlugin.setDrawMode('flag');
     StoreWhiteBoard.setDrawMode('flag');
   },
   // 设置绘图模式: 自由绘图模式
-  setDrawModeFree: function() {
+  setDrawModeFree: function () {
     this.drawPlugin && this.drawPlugin.setDrawMode('free');
     StoreWhiteBoard.setDrawMode('free');
   },
@@ -157,90 +157,89 @@ export default {
     this.drawPlugin && this.drawPlugin.clear();
   },
   act(obj) {
-	this.drawPlugin && this.drawPlugin.act({ account: obj.account, data: obj.data })
+    this.drawPlugin && this.drawPlugin.act({ account: obj.account, data: obj.data })
   },
   // 文档上传
   uploadFile(data) {
     const fileInput = WhiteBoardState.fileInput;
-	$.ajax({
-             //几个参数需要注意一下
-                 type: "POST",//方法类型
-                 dataType: "json",//预期服务器返回的数据类型
-                 url: "https://api.starrtc.com/demo/upload_api" ,//url
-                 data: data,
-				 cache: false,
-				 processData: false,
-				 contentType: false,
-                 }
-             ).then((result)=>{
-				 console.log(result);//打印服务端返回的数据(调试用)
-                     if (result.status == 1) {
+    $.ajax({
+      //几个参数需要注意一下
+      type: "POST",//方法类型
+      dataType: "json",//预期服务器返回的数据类型
+      url: window.aecRequestBaseURL + "/doc/upload.php",//url
+      data: data,
+      cache: false,
+      processData: false,
+      contentType: false,
+    }
+    ).then((result) => {
+      console.log(result);//打印服务端返回的数据(调试用)
+      if (result.status == 1) {
 
-						  StoreWhiteBoard.addFile({
-							  docId:result.data,
-							  name: fileInput.files[0].name,
-							  mime: 3,
-							  state: 11,
-							  percent: 0,
-							  prefix: '',
-							  transType:10
-							});
-						 
-						  const param = {
-							  docId: result.data,
-							  name: fileInput.files[0].name,
-							  percent: 0,
-							  state: WhiteBoardState.serializeFileStateMap['TRANSING']
-							};
-						
-						 StoreWhiteBoard.setFileState(param);
-						 
-						 var checkTimer = setInterval(() => {
-						  // 当前文档是否还在, 是否已经转码完成
-							$.get("https://api.starrtc.com/demo/get_doc_info?id="+result.data)
-							.then((data)=>{
-								data = JSON.parse(data)
-								if(data.status == 1)
-								{
-									
-									const param = {
-									  docId: result.data,
-									  name: fileInput.files[0].name,
-									  percent: 100,
-									  state: WhiteBoardState.serializeFileStateMap['TRANSCOMPLETE'],
-									  pageCount:data.data.length,
-									  prefix:"https://api.starrtc.com/uploads/",
-									  keyword:"starRTC",
-									};
-									 StoreWhiteBoard.setFileState(param);
-									
-									clearInterval(checkTimer);
-									checkTimer = null;
-								}
-							})
-							.catch((error)=>{
-								console.log(error)
-							});
-						
-						}, 1000);
-                     }
-			 }).catch((error)=>{
-				 alert("异常！");
-			 }); 
+        StoreWhiteBoard.addFile({
+          docId: result.data,
+          name: fileInput.files[0].name,
+          mime: 3,
+          state: 11,
+          percent: 0,
+          prefix: '',
+          transType: 10
+        });
+
+        const param = {
+          docId: result.data,
+          name: fileInput.files[0].name,
+          percent: 0,
+          state: WhiteBoardState.serializeFileStateMap['TRANSING']
+        };
+
+        StoreWhiteBoard.setFileState(param);
+
+        var checkTimer = setInterval(() => {
+          // 当前文档是否还在, 是否已经转码完成
+          $.get(window.aecRequestBaseURL + "/doc/get_doc_info.php?id=" + result.data)
+            .then((data) => {
+              data = JSON.parse(data)
+              if (data.status == 1) {
+
+                const param = {
+                  docId: result.data,
+                  name: fileInput.files[0].name,
+                  percent: 100,
+                  state: WhiteBoardState.serializeFileStateMap['TRANSCOMPLETE'],
+                  pageCount: data.data.length,
+                  pages: data.data,
+                  keyword: "starRTC",
+                };
+                StoreWhiteBoard.setFileState(param);
+
+                clearInterval(checkTimer);
+                checkTimer = null;
+              }
+            })
+            .catch((error) => {
+              console.log(error)
+            });
+
+        }, 1000);
+      }
+    }).catch((error) => {
+      alert("异常！");
+    });
   },
   // 设置背景
   setImage(index = 1, item = WhiteBoardState.currentFile) {
     console.log('setImage', item);
     const name = item.name.replace(/\.\w+$/, '');
-	var tmp = index - 1;
-    const url = `${item.prefix}${item.docId}/${item.keyword}-${tmp}.${WhiteBoardState.fileTypeMap[item.transType]}`;
+    var tmp = index - 1;
+    const url = `${item.pages[tmp]}`;
     this.drawPlugin &&
       this.drawPlugin.image({
-        url:url,
+        url: url,
         docId: item.docId,
         pageCount: item.pageCount,
         currentPage: index,
-		item: item,
+        item: item,
       });
     StoreWhiteBoard.setCurrentFilePage(index);
   },
@@ -252,17 +251,17 @@ export default {
   },
   // 删除文件
   deleteFile(docId) {
-	  const param = {
-          docId: docId,
-          percent: 0,
-          state: WhiteBoardState.serializeFileStateMap['TRANSING']
-        };
-        StoreWhiteBoard.setFileState(param);
-        StoreWhiteBoard.deleteFile(docId);
+    const param = {
+      docId: docId,
+      percent: 0,
+      state: WhiteBoardState.serializeFileStateMap['TRANSING']
+    };
+    StoreWhiteBoard.setFileState(param);
+    StoreWhiteBoard.deleteFile(docId);
   },
   // 拉取具体文件
   getFile(docId) {
-    
+
   },
   // 拉取文件列表
   getFileList() {
