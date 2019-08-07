@@ -44,13 +44,19 @@ export default {
       window.StarRtc.Instance.login(NimState.agentId, account,
         (data, status) => {
           switch (status) {
-            case "connect success":
-              NimAction.setNim(window.StarRtc.Instance);
-              NimAction.setAccount(account);
-              NimAction.setToken(token);
-              return resolve();
             case "connect failed":
               return reject("connect failed");
+            case "onLoginMessage":
+              if (data.status == "success") {
+                NimAction.setNim(window.StarRtc.Instance);
+                NimAction.setAccount(account);
+                NimAction.setToken(token);
+                window.StarRtc.Instance.version();
+                return resolve();
+              }
+              else {
+                return reject("login failed");
+              }
           }
         });
     });

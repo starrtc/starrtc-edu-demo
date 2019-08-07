@@ -20,6 +20,15 @@ var webrtcIP = "123.103.93.74";
 
 window.aecRequestBaseURL = "https://www.starrtc.com/aec";
 
+/* var LOG_LEVEL = {
+	LOG_LEVEL_DEBUG: i++,
+	LOG_LEVEL_INFO: i++,
+	LOG_LEVEL_WARN: i++,
+	LOG_LEVEL_ERROR: i++ */
+
+//设置日志等级，开启低等级日志会包含高等级日志，如开启DEBUG，则同时开启INFO、WARN、ERROR，默认为开启DEBUG
+window.StarRtc.InitlogLevel(window.StarRtc.LOG_LEVEL.LOG_LEVEL_DEBUG);
+
 //window.StarRtc.Instance.setConfigUseAEC(true);    							//是否开启AEC
 
 window.StarRtc.Instance.setMsgServerInfo(privateURL, 19903) 					//ip, websocket port  //需要手动从浏览器输入 https://ip:29991 信任证书
