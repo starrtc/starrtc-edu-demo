@@ -40,15 +40,16 @@ export default class extends Component {
     if (!this.state.ChangeVideoStatus) {
       return
     }
-    this.state.ChangeVideoStatus = false
+    this.state.ChangeVideoStatus = false;
     const v = !NetcallState.video;
     NetcallAction.setVideo(v);
     console.log("toggleVideo -> ", v);
     if (v) {
-      
+      NetcallState.room.publishStream({ "video": true });
     } else {
-     
+      NetcallState.room.publishStream({ "video": false });
     }
+    this.state.ChangeVideoStatus = true;
   };
 
   //开关本地音频播放
@@ -61,10 +62,11 @@ export default class extends Component {
     NetcallAction.setAudio(v);
     console.log("toggleAudio -> ", v);
     if (v) {
-     
+      NetcallState.room.publishStream({ "audio": true });
     } else {
-      
+      NetcallState.room.publishStream({ "audio": true });
     }
+    this.state.ChangeAudioStatus = true;
   };
 
   toggleFullscreen = e => {
@@ -160,23 +162,23 @@ export default class extends Component {
                   onClick={this.toggleVideo}
                 />
               ) : (
-                <span>
-                  <span
-                    id="tip4video"
-                    className="tip tip4video"
-                    style={{
-                      display: "none"
-                    }}
-                  >
-                    摄像头不可用
+                  <span>
+                    <span
+                      id="tip4video"
+                      className="tip tip4video"
+                      style={{
+                        display: "none"
+                      }}
+                    >
+                      摄像头不可用
                   </span>
-                  <span
-                    className={classNames("video", "video-disabled", NetcallState.shareStarted ? "hide-import" : "")}
-                    onMouseOver={this.onMouseOver.bind(this, "video")}
-                    onMouseOut={this.onMouseOut.bind(this, "video")}
-                  />
-                </span>
-              )}
+                    <span
+                      className={classNames("video", "video-disabled", NetcallState.shareStarted ? "hide-import" : "")}
+                      onMouseOver={this.onMouseOver.bind(this, "video")}
+                      onMouseOut={this.onMouseOut.bind(this, "video")}
+                    />
+                  </span>
+                )}
               {NetcallState.hasAudio ? (
                 <span
                   className={classNames(
@@ -186,23 +188,23 @@ export default class extends Component {
                   onClick={this.toggleAudio}
                 />
               ) : (
-                <span>
-                  <span
-                    id="tip4audio"
-                    className="tip tip4audio"
-                    style={{
-                      display: "none"
-                    }}
-                  >
-                    麦克风不可用
+                  <span>
+                    <span
+                      id="tip4audio"
+                      className="tip tip4audio"
+                      style={{
+                        display: "none"
+                      }}
+                    >
+                      麦克风不可用
                   </span>
-                  <span
-                    className={classNames("audio", "audio-disabled")}
-                    onMouseOver={this.onMouseOver.bind(this, "audio")}
-                    onMouseOut={this.onMouseOut.bind(this, "audio")}
-                  />
-                </span>
-              )}
+                    <span
+                      className={classNames("audio", "audio-disabled")}
+                      onMouseOver={this.onMouseOver.bind(this, "audio")}
+                      onMouseOut={this.onMouseOut.bind(this, "audio")}
+                    />
+                  </span>
+                )}
             </div>
           )}
       </div>
