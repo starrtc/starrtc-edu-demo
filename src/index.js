@@ -13,7 +13,7 @@ window.StarRtc.Instance = new StarRtc.StarSDK();
 window.DrawPlugin = DrawPlugin;
 
 ////////////////////////私有云改配置///////////////////////
-///////////////////////以下privateURL需替换为私有部署IP////
+///////////////////////以下privateURL，webrtcIP需替换为私有部署IP，privateURL可为域名，webrtcIP只能为IP////
 
 var privateURL = "demo.starrtc.com";
 var webrtcIP = "123.103.93.74";	
