@@ -16,7 +16,7 @@ window.DrawPlugin = DrawPlugin;
 ///////////////////////以下privateURL，webrtcIP需替换为私有部署IP，privateURL可为域名，webrtcIP只能为IP////
 
 var privateURL = "demo.starrtc.com";
-var webrtcIP = "123.103.93.74";	
+var webrtcIP = "47.105.65.73";	
 
 window.aecRequestBaseURL = "https://www.starrtc.com/aec";
 
